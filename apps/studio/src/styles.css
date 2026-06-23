@@ -1,0 +1,408 @@
+:root {
+  color: #e5e7eb;
+  background: #0c1017;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.studio-app {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(240px, 300px) minmax(520px, 1fr) minmax(280px, 380px);
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.panel,
+.preview-column {
+  background: #121722;
+  border: 1px solid #273142;
+  border-radius: 8px;
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow: hidden;
+  padding: 18px;
+}
+
+.project-panel,
+.export-panel {
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+}
+
+.preview-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+}
+
+.eyebrow {
+  color: #91a4bd;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 26px;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+p {
+  color: #aab6c7;
+  line-height: 1.5;
+}
+
+section {
+  display: grid;
+  gap: 10px;
+}
+
+.tree-item {
+  background: #171e2b;
+  border: 1px solid #293449;
+  border-radius: 6px;
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+}
+
+.tree-item.active {
+  border-color: #6ba3ff;
+}
+
+.tree-item span {
+  font-weight: 700;
+}
+
+.tree-item small {
+  color: #91a4bd;
+  line-height: 1.35;
+}
+
+.preview-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.toolbar-actions,
+.segmented {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  background: #202a3b;
+  border: 1px solid #354259;
+  border-radius: 6px;
+  color: #f8fafc;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+button:hover,
+button.selected {
+  background: #2f6feb;
+  border-color: #74a7ff;
+}
+
+.stage-shell {
+  aspect-ratio: 1280 / 720;
+  background: #070a10;
+  border: 1px solid #303b4f;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.stage-shell > div {
+  height: 100%;
+  width: 100%;
+}
+
+.timeline-strip {
+  background: #0f141e;
+  border: 1px solid #273142;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.timeline-strip input {
+  width: 100%;
+}
+
+.timeline-meta {
+  color: #91a4bd;
+  display: flex;
+  font-size: 13px;
+  justify-content: space-between;
+}
+
+.active-frame-card {
+  background: #0f141e;
+  border: 1px solid #273142;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+}
+
+.active-frame-card strong {
+  font-size: 18px;
+}
+
+code,
+pre {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+code {
+  background: #070a10;
+  border-radius: 6px;
+  color: #bfe1ff;
+  display: block;
+  font-size: 12px;
+  overflow: auto;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
+pre {
+  background: #070a10;
+  border: 1px solid #273142;
+  border-radius: 8px;
+  color: #dbeafe;
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+}
+
+.surface {
+  height: 100%;
+  overflow: hidden;
+  padding: 44px;
+  width: 100%;
+}
+
+.surface-workspace {
+  background: linear-gradient(135deg, #151b29, #273246 48%, #0f172a);
+}
+
+.workspace-topbar {
+  align-items: center;
+  background: rgb(255 255 255 / 8%);
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+}
+
+.workspace-topbar span {
+  background: #8aa4c6;
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+}
+
+.workspace-topbar strong {
+  margin-left: 12px;
+}
+
+.workspace-grid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: 1.4fr 0.8fr;
+  margin-top: 34px;
+}
+
+.workspace-panel {
+  background: rgb(255 255 255 / 9%);
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 8px;
+  padding: 26px;
+}
+
+.workspace-panel.primary h2 {
+  color: white;
+  font-size: 42px;
+  line-height: 1.05;
+  margin-top: 18px;
+  max-width: 560px;
+}
+
+.workspace-panel.secondary {
+  align-self: end;
+  display: grid;
+  gap: 16px;
+}
+
+.progress-track {
+  background: rgb(255 255 255 / 12%);
+  border-radius: 99px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.progress-track span {
+  background: #7dd3fc;
+  display: block;
+  height: 100%;
+}
+
+.surface-agent {
+  align-items: center;
+  background: radial-gradient(circle at 50% 20%, #32415e, #101827 58%);
+  display: flex;
+  justify-content: center;
+}
+
+.agent-card {
+  background: #f8fafc;
+  border-radius: 8px;
+  box-shadow: 0 32px 120px rgb(0 0 0 / 38%);
+  color: #101827;
+  max-width: 680px;
+  padding: 36px;
+  transition: transform 120ms linear;
+}
+
+.surface-label {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.agent-card h2 {
+  font-size: 36px;
+  line-height: 1.1;
+  margin-top: 14px;
+}
+
+.agent-card p {
+  color: #475569;
+  font-size: 18px;
+  margin-top: 14px;
+}
+
+.agent-steps {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 28px;
+}
+
+.agent-steps span {
+  background: #e8eef8;
+  border-radius: 6px;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px;
+  text-align: center;
+}
+
+.surface-review {
+  align-items: center;
+  background: linear-gradient(135deg, #111827, #183642);
+  display: flex;
+  justify-content: center;
+}
+
+.review-window {
+  background: #0b1220;
+  border: 1px solid #3b5269;
+  border-radius: 8px;
+  box-shadow: 0 28px 100px rgb(0 0 0 / 35%);
+  max-width: 760px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.review-header {
+  align-items: center;
+  background: #152033;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.review-header span {
+  color: #91a4bd;
+}
+
+.review-body {
+  display: grid;
+  gap: 22px;
+  padding: 28px;
+}
+
+.review-body small {
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.review-body h2 {
+  font-size: 32px;
+  margin-top: 8px;
+}
+
+.review-verdict {
+  background: #ecfeff;
+  border-radius: 6px;
+  color: #155e75;
+  font-weight: 800;
+  padding: 18px;
+}
+
+@media (max-width: 1180px) {
+  .studio-app {
+    grid-template-columns: 1fr;
+  }
+
+  .project-panel,
+  .export-panel {
+    max-height: none;
+  }
+}
