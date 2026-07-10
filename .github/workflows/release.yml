@@ -14,12 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.25.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
           registry-url: https://registry.npmjs.org
-      - run: corepack enable && corepack prepare pnpm@10.25.0 --activate
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:release
       - uses: changesets/action@v1

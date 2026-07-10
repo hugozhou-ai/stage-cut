@@ -1,10 +1,14 @@
 import { execFileSync } from "node:child_process";
 
 const LOG_PREFIX = "[stagecut:commitlint]";
-const range = process.argv[2] || "HEAD~20..HEAD";
+const requestedRange = process.argv[2];
+const range = requestedRange ?? "last-20";
 let messages;
 try {
-  messages = execFileSync("git", ["log", "--format=%s", range], { encoding: "utf8" }).split("\n").filter(Boolean);
+  const gitArguments = requestedRange
+    ? ["log", "--format=%s", requestedRange]
+    : ["log", "--format=%s", "--max-count=20", "HEAD"];
+  messages = execFileSync("git", gitArguments, { encoding: "utf8" }).split("\n").filter(Boolean);
 } catch (error) {
   console.error(`${LOG_PREFIX} ${JSON.stringify({ event: "git-log-error", message: error.message, range })}`);
   process.exit(1);

@@ -42,7 +42,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "rm -rf dist && vite build && node ../../scripts/create-cjs-types.mjs dist/types",
+    "build": "vite build && node ../../scripts/create-cjs-types.mjs dist/types",
+    "prepack": "pnpm run build",
     "test": "pnpm exec vitest run src/react.test.tsx --environment jsdom",
     "test:coverage": "pnpm exec vitest run src/react.test.tsx --environment jsdom --coverage --coverage.thresholds.lines=90 --coverage.thresholds.functions=90 --coverage.thresholds.statements=90 --coverage.thresholds.branches=90",
     "type-check": "tsc --noEmit"

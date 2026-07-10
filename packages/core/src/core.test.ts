@@ -63,6 +63,13 @@ describe("project parsing", () => {
     }
   });
 
+  it("preserves an explicitly empty optional description", () => {
+    const project = createProject({ description: "" });
+
+    expect(project).toHaveProperty("description", "");
+    expect(JSON.parse(serializeStagecutProject(project))).toHaveProperty("description", "");
+  });
+
   it("returns structured paths for invalid external JSON", () => {
     const source = JSON.parse(serializeStagecutProject(createProject())) as Record<string, unknown>;
     const videos = source.videos as Array<Record<string, unknown>>;

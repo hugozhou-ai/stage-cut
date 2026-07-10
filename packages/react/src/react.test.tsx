@@ -149,6 +149,30 @@ describe("surface registry", () => {
       "missing registered surfaces",
     );
   });
+
+  it("allows declared surfaces that are not used by the current timeline", () => {
+    const project = defineStagecutProject({
+      id: "unused-surface-project",
+      name: "Unused surface project",
+      schemaVersion: 1,
+      stages: [{ height: 100, id: "stage", name: "Stage", width: 100 }],
+      surfaces: [{ id: "future", name: "Future" }],
+      videos: [
+        {
+          fps: 30,
+          id: "empty-layer-video",
+          name: "Empty layer video",
+          scenes: [{ durationInFrames: 10, id: "scene", layers: [] }],
+          stageId: "stage",
+        },
+      ],
+    });
+
+    const registry = defineSurfaceRegistry(project, {
+      future: ({ input }) => <div>{String(input.label ?? "future")}</div>,
+    });
+    expect(Object.keys(registry)).toEqual(["future"]);
+  });
 });
 
 describe("StagecutPlayerService", () => {

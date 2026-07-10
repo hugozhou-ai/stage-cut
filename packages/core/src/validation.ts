@@ -52,11 +52,10 @@ class ProjectParser {
     if (schemaVersion !== 1) {
       this.issue("unsupported_schema", "$.schemaVersion", "must be exactly 1");
     }
+    const description = this.optionalString(root.description, "$.description");
 
     const project: StagecutProjectDefinition = {
-      ...((this.optionalString(root.description, "$.description") as string | undefined)
-        ? { description: root.description as string }
-        : {}),
+      ...(description === undefined ? {} : { description }),
       id: this.id(root.id, "$.id"),
       ...(root.metadata === undefined ? {} : { metadata: this.jsonObject(root.metadata, "$.metadata") }),
       name: this.nonEmptyString(root.name, "$.name"),
