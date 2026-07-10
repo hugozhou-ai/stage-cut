@@ -1,19 +1,42 @@
 {
   "name": "stagecut",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.5.0-beta.2",
   "type": "module",
+  "engines": {
+    "node": ">=20 <25",
+    "pnpm": ">=10 <12"
+  },
   "scripts": {
-    "build": "pnpm -r --if-present run build",
-    "dev": "pnpm --filter @stagecut/studio run dev",
+    "build": "pnpm run build:packages && pnpm --filter @stagecut/gallery run build",
+    "build:packages": "pnpm --filter @stagecut/core run build && pnpm --filter @stagecut/react run build",
+    "changeset": "changeset",
+    "changeset:status": "changeset status",
+    "commitlint": "node scripts/check-conventional-commits.mjs",
+    "dev": "pnpm run build:packages && pnpm --filter @stagecut/gallery run dev",
+    "format": "pnpm exec biome check --write .",
     "lint": "pnpm exec biome check .",
-    "test": "pnpm -r --if-present run test",
-    "type-check": "pnpm -r --if-present run type-check"
+    "pack:check": "pnpm run build:packages && pnpm size:check && pnpm --filter @stagecut/core exec publint && pnpm --filter @stagecut/react exec publint && pnpm --filter @stagecut/core exec attw --pack . && pnpm --filter @stagecut/react exec attw --pack .",
+    "release": "changeset publish",
+    "size:check": "node scripts/check-package-size.mjs",
+    "test": "pnpm run build:packages && pnpm --filter @stagecut/core run test && pnpm --filter @stagecut/react run test",
+    "test:coverage": "pnpm run build:packages && pnpm --filter @stagecut/core run test:coverage && pnpm --filter @stagecut/react run test:coverage",
+    "test:consumers": "node scripts/verify-package-consumers.mjs",
+    "type-check": "pnpm --filter @stagecut/core run type-check && pnpm --filter @stagecut/react run type-check && pnpm --filter @stagecut/gallery run type-check",
+    "verify": "pnpm lint && pnpm changeset:status && pnpm type-check && pnpm test && pnpm build && pnpm pack:check",
+    "verify:release": "pnpm verify && pnpm test:consumers"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@changesets/cli": "^2.29.8",
+    "@microsoft/api-extractor": "7.58.9",
     "@biomejs/biome": "^2.4.6",
     "@types/node": "^24.12.2",
+    "@vitest/coverage-v8": "4.1.9",
+    "publint": "^0.3.15",
     "typescript": "^5.9.3",
+    "vite": "^8.0.9",
+    "vite-plugin-dts": "5.0.3",
     "vitest": "^4.1.5"
   },
   "packageManager": "pnpm@10.25.0"

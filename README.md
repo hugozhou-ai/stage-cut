@@ -1,91 +1,96 @@
 # Stagecut
 
-Stagecut is an open-source prototype for making playable DOM player-videos with Agent and engineer collaboration.
+Stagecut is a high-performance React runtime for playing deterministic DOM animations in web pages. Projects are portable JSON; React surface components provide the visuals; a compiled scene timeline keeps playback work bounded.
 
-It is closer to a lightweight production platform than a normal animation package. A Stagecut project describes stages, surfaces, frames, transitions, metadata, and playback settings. The Studio previews that structure in the browser and exports both the project file and an Agent prompt for implementing the same player-video in a target repository.
+Stagecut is designed for browser playback. It does not export MP4/WebM, manage audio, or provide a visual editor.
 
-## What Stagecut Is
+## Features
 
-- A structured DOM animation studio for player-videos.
-- A way to compose reusable surfaces into frame-based timelines.
-- A Remotion-backed preview/player runtime for React pages.
-- A handoff tool that exports project JSON and an Agent implementation prompt.
+- Serializable Project → Stage → Video → Scene → Layer model
+- Parallel layers inside sequential scenes
+- Fade, slide, zoom, and wipe scene transitions
+- Runtime validation with structured field paths
+- O(log n) active-scene lookup and a two-scene render window
+- React 18/19 and SSR-safe player mounting
+- Remotion-powered playback behind a Stagecut-owned controller API
 
-## What Stagecut Is Not
-
-- It is not a traditional video editor.
-- It is not an iframe hosting product in v1.
-- It is not a pixel-level drag-and-drop design tool yet.
-- It is not centered on publishing a package name; runtime packages are implementation support for the platform.
-
-## Workspace
-
-```text
-apps/studio       Stagecut Studio app
-packages/core     Pure project, video, frame, timeline, transition, and export model
-packages/react    React + Remotion player adapter, composition, controller, and hooks
-```
-
-## Development
+## Install
 
 ```bash
+pnpm add @stagecut/core @stagecut/react react react-dom
+```
+
+`@stagecut/react` uses Remotion internally. Review [Remotion licensing](docs/remotion-license.md) and explicitly acknowledge it on the player when appropriate.
+
+## Quick start
+
+```tsx
+import { compileStagecutVideo, defineStagecutProject } from "@stagecut/core";
+import { defineSurfaceRegistry, StagecutPlayer } from "@stagecut/react";
+
+const project = defineStagecutProject({
+  schemaVersion: 1,
+  id: "hello-project",
+  name: "Hello Project",
+  stages: [{ id: "main", name: "Main", width: 1280, height: 720, background: "#101827" }],
+  surfaces: [{ id: "title", name: "Title" }],
+  videos: [{
+    id: "hello",
+    name: "Hello",
+    stageId: "main",
+    fps: 60,
+    scenes: [{
+      id: "intro",
+      durationInFrames: 120,
+      layers: [{ id: "title", surfaceId: "title", inputProps: { text: "Hello Stagecut" } }],
+    }],
+  }],
+});
+
+const surfaces = defineSurfaceRegistry(project, {
+  title: ({ input, context }) => (
+    <h1 style={{ opacity: context.progress }}>{input.text}</h1>
+  ),
+});
+
+const video = compileStagecutVideo(project, "hello");
+
+export function Preview() {
+  return <StagecutPlayer acknowledgeRemotionLicense surfaces={surfaces} video={video} />;
+}
+```
+
+Surface components receive `{ input, context }`. Input is JSON data from the layer; context contains `globalFrame`, `localFrame`, `progress`, `fps`, `sceneId`, and `layerId`. Surface interaction is intentionally disabled so playback stays deterministic.
+
+## External JSON
+
+Use `parseStagecutProject(unknown)` for external data. Validation failures throw `StagecutValidationError` with an `issues` array containing `path`, `code`, and `message`. Use `safeParseStagecutProject()` when a discriminated result is more convenient. `serializeStagecutProject()` produces canonical formatted JSON.
+
+## Gallery
+
+```bash
+corepack enable
 pnpm install
 pnpm dev
 ```
 
-Open the Studio URL printed by Vite. The default demo project includes:
+Open the URL printed by Vite. The Gallery contains Basic Player, Layered Product Tour, Transition Catalog, and a 1080p60 Performance Lab with 500 scenes and eight layers per scene.
 
-- one stage: `desktop-stage`
-- three surfaces: `workspace-shell`, `agent-dialog`, `file-review`
-- one player-video: `studio-demo-video`
-
-## From Studio To A Target Repo
-
-1. Define the project structure in Studio: stage size, surfaces, frames, transition rules, and metadata.
-2. Preview the video and inspect the active frame state.
-3. Export the project JSON as the durable source of truth.
-4. Export the Agent prompt.
-5. In the target React repository, ask an Agent to implement the listed surfaces and compose them with the Stagecut runtime.
-
-The prompt is intentionally structural. It tells the Agent which surfaces to create, how frames reference them, which durations and transitions must be preserved, and where to keep the project definition for future edits.
-
-## Minimal Player-Video
-
-```tsx
-import { PlayerVideo, VideoFrame } from "@stagecut/core";
-import { StagecutPlayer } from "@stagecut/react";
-
-const video = new PlayerVideo({
-  fps: 30,
-  height: 720,
-  id: "hello-video",
-  name: "Hello Video",
-  stageId: "main-stage",
-  width: 1280,
-  frames: [
-    new VideoFrame({
-      durationInFrames: 60,
-      id: "hello-frame",
-      inputProps: { title: "Hello Stagecut" },
-      surfaceId: "hello-surface",
-    }).toJSON(),
-  ],
-});
-
-function HelloSurface({ title }: { title?: string }) {
-  return <div>{title}</div>;
-}
-
-export function Preview() {
-  return <StagecutPlayer surfaces={{ "hello-surface": HelloSurface }} video={video} />;
-}
-```
+The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
 
 ## Verification
 
 ```bash
-pnpm lint
-pnpm type-check
-pnpm test
-pnpm build
+pnpm verify
+pnpm test:coverage
 ```
+
+See [architecture](docs/architecture.md), [performance](docs/performance.md), and the [0.1 migration guide](docs/migration-0.1.md).
+
+Maintainers should follow [RELEASING.md](RELEASING.md); publishing is manually approved and never runs automatically on a branch push.
+
+## Contributing and security
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Report vulnerabilities through the process in [SECURITY.md](SECURITY.md).
+
+Stagecut is available under the [MIT License](LICENSE).

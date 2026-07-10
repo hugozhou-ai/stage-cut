@@ -1,135 +1,137 @@
 import type { PlayerRef } from "@remotion/player";
 import { Player } from "@remotion/player";
-import type { PlayerVideo } from "@stagecut/core";
+import type { CompiledStagecutVideo } from "@stagecut/core";
 import type { CSSProperties, Ref } from "react";
-import { useEffect, useImperativeHandle, useRef, useSyncExternalStore } from "react";
+import { useEffect, useImperativeHandle, useMemo, useRef, useSyncExternalStore } from "react";
 import { useStagecutPlayerController } from "./hooks";
+import { assertVideoSurfaceRegistry } from "./registry";
 import { StagecutComposition } from "./StagecutComposition";
 import type { StagecutPlayerService } from "./StagecutPlayerService";
-import type { StagecutMountPolicy, SurfaceComponentMap } from "./types";
+import type { SurfaceComponentMap } from "./types";
 
 export interface StagecutPlayerProps {
+  acknowledgeRemotionLicense?: boolean;
+  ariaLabel?: string;
   className?: string;
   controller?: StagecutPlayerService;
   controllerRef?: Ref<StagecutPlayerService>;
   controls?: boolean;
-  mountPolicy?: StagecutMountPolicy;
+  onError?: (error: Error) => void;
   style?: CSSProperties;
   surfaces: SurfaceComponentMap;
-  video: PlayerVideo;
+  video: CompiledStagecutVideo;
 }
 
 function subscribeToClientReady(listener: () => void): () => void {
   if (typeof window === "undefined") {
     return () => undefined;
   }
-
   const timeout = window.setTimeout(listener, 0);
-
-  return () => {
-    window.clearTimeout(timeout);
-  };
-}
-
-function getClientReadySnapshot(): boolean {
-  return typeof window !== "undefined";
-}
-
-function getServerClientReadySnapshot(): boolean {
-  return false;
+  return () => window.clearTimeout(timeout);
 }
 
 function useClientReady(): boolean {
-  return useSyncExternalStore(subscribeToClientReady, getClientReadySnapshot, getServerClientReadySnapshot);
+  return useSyncExternalStore(
+    subscribeToClientReady,
+    () => typeof window !== "undefined",
+    () => false,
+  );
 }
 
 export function StagecutPlayer({
+  acknowledgeRemotionLicense = false,
+  ariaLabel = "Stagecut animation",
   className,
   controller: externalController,
   controllerRef,
   controls,
-  mountPolicy = "auto",
+  onError,
   style,
   surfaces,
   video,
 }: StagecutPlayerProps) {
   const isClientReady = useClientReady();
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
   const playerRef = useRef<PlayerRef>(null);
   const fallbackController = useStagecutPlayerController(video);
   const controller = externalController ?? fallbackController;
+  const surfaceIds = useMemo(
+    () => [...new Set(video.video.scenes.flatMap((scene) => scene.layers.map((layer) => layer.surfaceId)))],
+    [video],
+  );
+  assertVideoSurfaceRegistry(surfaceIds, surfaces);
 
   if (controller.video !== video) {
     throw new Error(
-      `StagecutPlayer controller video "${controller.video.id}" does not match prop video "${video.id}".`,
+      `Stagecut controller video does not match player video: ${JSON.stringify({ controllerVideoId: controller.video.id, playerVideoId: video.id })}`,
     );
   }
-
   useImperativeHandle(controllerRef, () => controller, [controller]);
 
   useEffect(() => {
     const player = playerRef.current;
-    if (!player || !isClientReady || mountPolicy === "placeholder") {
+    if (!player || !isClientReady) {
       return undefined;
     }
-
     controller.attachPlayer(player);
-
     const onPlay = () => controller.markPlaying();
     const onPause = () => controller.markPaused();
     const onEnded = () => controller.markEnded();
     const onWaiting = () => controller.markBuffering();
     const onResume = () => controller.markResumed();
-    const onError = (event: { detail: { error: Error } }) => controller.markError(event.detail.error);
+    const onPlayerError = (event: { detail: { error: Error } }) => {
+      controller.markError(event.detail.error);
+      onErrorRef.current?.(event.detail.error);
+    };
     const onFrameUpdate = (event: { detail: { frame: number } }) => controller.setCurrentFrame(event.detail.frame);
-
     player.addEventListener("play", onPlay);
     player.addEventListener("pause", onPause);
     player.addEventListener("ended", onEnded);
     player.addEventListener("waiting", onWaiting);
     player.addEventListener("resume", onResume);
-    player.addEventListener("error", onError);
+    player.addEventListener("error", onPlayerError);
     player.addEventListener("frameupdate", onFrameUpdate);
     player.addEventListener("timeupdate", onFrameUpdate);
     player.addEventListener("seeked", onFrameUpdate);
-
     return () => {
       player.removeEventListener("play", onPlay);
       player.removeEventListener("pause", onPause);
       player.removeEventListener("ended", onEnded);
       player.removeEventListener("waiting", onWaiting);
       player.removeEventListener("resume", onResume);
-      player.removeEventListener("error", onError);
+      player.removeEventListener("error", onPlayerError);
       player.removeEventListener("frameupdate", onFrameUpdate);
       player.removeEventListener("timeupdate", onFrameUpdate);
       player.removeEventListener("seeked", onFrameUpdate);
       controller.detachPlayer(player);
     };
-  }, [controller, isClientReady, mountPolicy]);
+  }, [controller, isClientReady]);
 
-  if (!isClientReady || mountPolicy === "placeholder") {
+  const mergedStyle = { aspectRatio: `${video.stage.width} / ${video.stage.height}`, ...style };
+  if (!isClientReady) {
     return (
       <div
-        aria-hidden="true"
+        aria-label={ariaLabel}
         className={className}
         data-stagecut-placeholder="true"
-        style={{
-          aspectRatio: `${video.width} / ${video.height}`,
-          ...style,
-        }}
+        role="img"
+        style={mergedStyle}
       />
     );
   }
 
   return (
     <Player
-      acknowledgeRemotionLicense
+      acknowledgeRemotionLicense={acknowledgeRemotionLicense}
+      aria-label={ariaLabel}
       autoPlay={video.playback.autoPlay}
       className={className}
       component={StagecutComposition}
-      compositionHeight={video.height}
-      compositionWidth={video.width}
+      compositionHeight={video.stage.height}
+      compositionWidth={video.stage.width}
       controls={controls ?? video.playback.controls}
-      durationInFrames={video.durationInFrames}
+      durationInFrames={video.timeline.durationInFrames}
       fps={video.fps}
       initiallyMuted
       inputProps={{ surfaces, video }}
@@ -138,7 +140,7 @@ export function StagecutPlayer({
       numberOfSharedAudioTags={0}
       ref={playerRef}
       showVolumeControls={false}
-      style={style}
+      style={mergedStyle}
     />
   );
 }

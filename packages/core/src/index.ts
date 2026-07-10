@@ -1,24 +1,29 @@
-export { exportAgentPrompt, exportProjectJson, exportProjectJsonString } from "./exporters";
-export { PlayerVideo } from "./PlayerVideo";
-export { StagecutProject } from "./StagecutProject";
+export { compileStagecutVideo } from "./compiler";
+export {
+  defineStagecutProject,
+  parseStagecutProject,
+  safeParseStagecutProject,
+  serializeStagecutProject,
+} from "./project";
 export { normalizeTransition, progressForRange, resolveTransitionDuration } from "./transitions";
 export type {
-  FrameTransitionOverrides,
+  CompiledScene,
+  CompiledStagecutVideo,
+  CompiledTimeline,
   JsonObject,
   JsonPrimitive,
   JsonValue,
+  LayerDefinition,
   PlaybackOptions,
-  PlayerVideoOptions,
-  ResolvedTimeline,
-  StagecutProjectJson,
-  StagecutProjectOptions,
+  SceneDefinition,
+  SceneTransitionEdge,
+  StagecutParseResult,
+  StagecutProjectDefinition,
+  StagecutValidationIssue,
   StageDefinition,
   SurfaceDefinition,
-  TimelineEdge,
-  TimelineItem,
   TransitionConfig,
   TransitionName,
-  VideoFrameDefinition,
-  VideoFrameOptions,
+  VideoDefinition,
 } from "./types";
-export { VideoFrame } from "./VideoFrame";
+export { StagecutValidationError } from "./validation";

@@ -1,34 +1,58 @@
-import type { PlayerRef } from "@remotion/player";
-import type { JsonObject } from "@stagecut/core";
-import type { ComponentType, CSSProperties, SyntheticEvent } from "react";
+import type { JsonObject, StagecutProjectDefinition } from "@stagecut/core";
+import type { ComponentType } from "react";
 
 export interface FrameRenderContext {
-  absoluteFrame: number;
-  frameId: string;
-  isActive: boolean;
+  fps: number;
+  globalFrame: number;
+  layerId: string;
   localFrame: number;
   progress: number;
+  sceneId: string;
+}
+
+export interface SurfaceComponentProps<TInputProps extends JsonObject = JsonObject> {
+  context: FrameRenderContext;
+  input: Readonly<TInputProps>;
 }
 
 export type SurfaceComponent<TInputProps extends JsonObject = JsonObject> = ComponentType<
-  TInputProps & FrameRenderContext
+  SurfaceComponentProps<TInputProps>
 >;
 
-export type SurfaceComponentMap = Record<string, SurfaceComponent<JsonObject>>;
+export type SurfaceComponentMap = Readonly<Record<string, unknown>>;
+
+type ProjectLayer<TProject extends StagecutProjectDefinition> =
+  TProject["videos"][number]["scenes"][number]["layers"][number];
+
+type InputForLayer<TLayer> = TLayer extends { inputProps: infer TInput }
+  ? TInput extends JsonObject
+    ? TInput
+    : JsonObject
+  : JsonObject;
+
+type InputForSurface<TProject extends StagecutProjectDefinition, TSurfaceId extends string> = InputForLayer<
+  Extract<ProjectLayer<TProject>, { surfaceId: TSurfaceId }>
+>;
+
+export type SurfaceRegistryForProject<TProject extends StagecutProjectDefinition> = {
+  readonly [TSurfaceId in TProject["surfaces"][number]["id"]]: SurfaceComponent<InputForSurface<TProject, TSurfaceId>>;
+};
 
 export interface TransitionStyleContext {
   direction: "enter" | "exit";
-  frameId: string;
   progress: number;
+  sceneId: string;
 }
 
+export type StagecutPlayerStatus = "idle" | "paused" | "playing" | "ended" | "buffering" | "error";
+
 export interface StagecutPlayerState {
-  activeFrameId: string | null;
+  activeSceneId: string | null;
   currentFrame: number;
   durationInFrames: number;
   isReady: boolean;
   lastError: string | null;
-  status: "idle" | "paused" | "playing" | "ended" | "buffering" | "error";
+  status: StagecutPlayerStatus;
 }
 
 export type StagecutPlayerPlaybackState = Pick<
@@ -37,27 +61,3 @@ export type StagecutPlayerPlaybackState = Pick<
 >;
 
 export type StagecutPlayerStateListener = () => void;
-
-export interface AttachablePlayer {
-  addEventListener: PlayerRef["addEventListener"];
-  getCurrentFrame: PlayerRef["getCurrentFrame"];
-  isPlaying: PlayerRef["isPlaying"];
-  pause: PlayerRef["pause"];
-  play: (event?: SyntheticEvent) => void;
-  removeEventListener: PlayerRef["removeEventListener"];
-  seekTo: PlayerRef["seekTo"];
-  toggle: (event?: SyntheticEvent) => void;
-}
-
-export type StagecutMountPolicy = "auto" | "placeholder";
-
-export interface ResolvedFrameRender {
-  absoluteFrame: number;
-  frameId: string;
-  inputProps: JsonObject;
-  isActive: boolean;
-  localFrame: number;
-  progress: number;
-  style: CSSProperties;
-  surfaceId: string;
-}
