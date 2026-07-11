@@ -1,5 +1,7 @@
 <p align="center">
-  <img alt="Stagecut logo" src="apps/gallery/src/assets/stage-cut.png" width="160" />
+  <a href="https://hugozhou-ai.github.io/stage-cut/">
+    <img alt="Stagecut logo — open the live production gallery" src="apps/gallery/src/assets/stage-cut.png" width="160" />
+  </a>
 </p>
 
 # Stagecut
@@ -7,6 +9,12 @@
 Stagecut is a high-performance React runtime for playing deterministic DOM animations in web pages. Projects are portable JSON; React surface components provide the visuals; a compiled scene timeline keeps playback work bounded.
 
 Stagecut is designed for browser playback. It does not export MP4/WebM, manage audio, or provide a visual editor.
+
+<p align="center">
+  <strong><a href="https://hugozhou-ai.github.io/stage-cut/">▶ Open the Live Production Gallery</a></strong>
+  <br />
+  <sub>Try interactive, production-style DOM animations built with Stagecut's public API.</sub>
+</p>
 
 ## Features
 
@@ -72,7 +80,11 @@ Use `parseStagecutProject(unknown)` for external data. Validation failures throw
 
 ## Gallery
 
-Explore the [live production gallery](https://hugozhou-ai.github.io/stage-cut/), or run it locally:
+> **[Open the Live Production Gallery →](https://hugozhou-ai.github.io/stage-cut/)**
+>
+> Explore interactive, production-style cases before installing or running Stagecut locally.
+
+To run the same Gallery locally:
 
 ```bash
 corepack enable
