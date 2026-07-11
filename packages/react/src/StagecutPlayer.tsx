@@ -108,7 +108,11 @@ export function StagecutPlayer({
     };
   }, [controller, isClientReady]);
 
-  const mergedStyle = { aspectRatio: `${video.stage.width} / ${video.stage.height}`, ...style };
+  const mergedStyle = {
+    aspectRatio: `${video.stage.width} / ${video.stage.height}`,
+    width: "100%",
+    ...style,
+  };
   if (!isClientReady) {
     return (
       <div
@@ -126,7 +130,7 @@ export function StagecutPlayer({
       acknowledgeRemotionLicense={acknowledgeRemotionLicense}
       aria-label={ariaLabel}
       autoPlay={video.playback.autoPlay}
-      className={className}
+      {...(className === undefined ? {} : { className })}
       component={StagecutComposition}
       compositionHeight={video.stage.height}
       compositionWidth={video.stage.width}

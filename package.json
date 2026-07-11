@@ -15,6 +15,7 @@
     "commitlint": "node scripts/check-conventional-commits.mjs",
     "dev": "pnpm run build:packages && pnpm --filter @stagecut/gallery run dev",
     "format": "pnpm exec biome check --write .",
+    "gallery:render": "pnpm run build:packages && pnpm --filter @stagecut/gallery run render",
     "lint": "pnpm exec biome check .",
     "pack:check": "pnpm run build:packages && pnpm size:check && pnpm --filter @stagecut/core exec publint && pnpm --filter @stagecut/react exec publint && pnpm --filter @stagecut/core exec attw --pack . && pnpm --filter @stagecut/react exec attw --pack .",
     "release": "changeset publish",
