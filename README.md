@@ -8,7 +8,7 @@
 
 [![中文文档](https://img.shields.io/badge/中文-文档-blue)](README.zh-CN.md)
 
-StageCut is a deterministic animation engine for building and playing interactive DOM video experiences with React. Projects are defined as portable JSON; React Surface components handle rendering; a compiled scene timeline ensures bounded, predictable playback performance.
+StageCut is an interactive, frame-precise animation engine for building and playing DOM video experiences with React. Projects are defined as portable JSON; React Surface components handle rendering; a compiled scene timeline ensures bounded, predictable playback performance.
 
 StageCut is designed for browser playback only. It does not provide MP4/WebM export, audio management, or a visual editor.
 
