@@ -12,11 +12,29 @@ StageCut is an interactive, frame-precise animation engine for building and play
 
 StageCut is designed for browser playback only. It does not provide MP4/WebM export, audio management, or a visual editor.
 
-<p align="center">
-  <strong><a href="https://hugozhou-ai.github.io/stage-cut/">▶ Open the Live Production Gallery</a></strong>
-  <br />
-  <sub>Try interactive, production-style DOM animations built with StageCut's public API.</sub>
-</p>
+> **Used in production:** [tutti.sh](https://tutti.sh/) — *"Where people and agents build in tune"*, a real-time shared workspace for people and AI agents — builds its site animations with StageCut. See the real implementation at [tutti-os/tutti](https://github.com/tutti-os/tutti) on GitHub.
+
+## Gallery
+
+Explore interactive, production-style cases before installing or running StageCut locally: **[Open the Live Production Gallery →](https://hugozhou-ai.github.io/stage-cut/)**
+
+To run the same Gallery locally:
+
+```bash
+corepack enable
+pnpm install
+pnpm dev
+```
+
+Open the URL printed by Vite. The gallery contains three production-style cases built with StageCut's public API. These cases are reconstructed from real screens on [tutti.sh](https://tutti.sh/); see [tutti-os/tutti](https://github.com/tutti-os/tutti) for the source project.
+
+### Application Creation Dialog
+
+[![Application Creation Dialog animation](docs/assets/gallery/application-dialog.gif)](docs/assets/gallery/application-dialog.mp4)
+
+Click the animation to open its full-resolution MP4. Regenerate the gallery media with `pnpm gallery:render`; the command requires FFmpeg on `PATH`.
+
+The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
 
 ## Features
 
@@ -79,30 +97,6 @@ Surface components receive `{ input, context }`. Input is JSON data from the lay
 ## External JSON
 
 Use `parseStagecutProject(unknown)` for external data. Validation failures throw `StagecutValidationError` with an `issues` array containing `path`, `code`, and `message`. Use `safeParseStagecutProject()` when a discriminated result is more convenient. `serializeStagecutProject()` produces canonical formatted JSON.
-
-## Gallery
-
-> **[Open the Live Production Gallery →](https://hugozhou-ai.github.io/stage-cut/)**
->
-> Explore interactive, production-style cases before installing or running StageCut locally.
-
-To run the same Gallery locally:
-
-```bash
-corepack enable
-pnpm install
-pnpm dev
-```
-
-Open the URL printed by Vite. The gallery contains three production-style cases built with StageCut's public API.
-
-### Application Creation Dialog
-
-[![Application Creation Dialog animation](docs/assets/gallery/application-dialog.gif)](docs/assets/gallery/application-dialog.mp4)
-
-Click the animation to open its full-resolution MP4. Regenerate the gallery media with `pnpm gallery:render`; the command requires FFmpeg on `PATH`.
-
-The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
 
 ## StageCut Devtools
 
