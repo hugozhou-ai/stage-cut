@@ -12,6 +12,8 @@
   "dependencies": {
     "@stagecut/core": "workspace:*",
     "@stagecut/react": "workspace:*",
+    "@fontsource-variable/lexend": "5.2.11",
+    "lucide-react": "1.17.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

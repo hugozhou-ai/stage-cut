@@ -1,23 +1,35 @@
-import { serializeStagecutProject } from "@stagecut/core";
 import { StagecutPlayer, useStagecutPlayerController, useStagecutPlayerState } from "@stagecut/react";
-import { StrictMode, useEffect, useMemo, useState } from "react";
-import { createRoot } from "react-dom/client";
-import { type GalleryPageId, galleryProject, gallerySurfaces, galleryVideos } from "./galleryProject";
+import { useEffect, useState } from "react";
+import { type GalleryPageId, gallerySurfaces, galleryVideos } from "./galleryProject";
+import { GalleryIcon } from "./icons";
 import "./styles.css";
 
-const pages: Array<{ description: string; id: GalleryPageId; label: string }> = [
-  { description: "Controls and deterministic frame state", id: "basic", label: "Basic Player" },
-  { description: "Parallel DOM layers in sequential scenes", id: "product-tour", label: "Layered Tour" },
-  { description: "Exact boundaries for built-in transitions", id: "transitions", label: "Transitions" },
-  { description: "1080p60 · 500 scenes · 8 layers", id: "performance", label: "Performance Lab" },
+const cases: Array<{ accent: string; id: GalleryPageId; index: string; label: string; summary: string }> = [
+  { accent: "#6d7ff5", id: "task-flow", index: "01", label: "Task Flow", summary: "Cross-functional project planning" },
+  {
+    accent: "#6d7ff5",
+    id: "message-cluster",
+    index: "02",
+    label: "Project Updates",
+    summary: "Spatial activity choreography",
+  },
+  {
+    accent: "#6d7ff5",
+    id: "application-dialog",
+    index: "03",
+    label: "Application Dialog",
+    summary: "Layered desktop workflow",
+  },
 ];
 
 function pageFromHash(): GalleryPageId {
   const id = window.location.hash.replace(/^#\/?/, "") as GalleryPageId;
-  return id in galleryVideos ? id : "basic";
+  if (id in galleryVideos) return id;
+  window.history.replaceState(null, "", "#/task-flow");
+  return "task-flow";
 }
 
-function useGalleryRoute() {
+function useGalleryRoute(): GalleryPageId {
   const [pageId, setPageId] = useState<GalleryPageId>(pageFromHash);
   useEffect(() => {
     const onHashChange = () => setPageId(pageFromHash());
@@ -27,176 +39,206 @@ function useGalleryRoute() {
   return pageId;
 }
 
-function useMeasuredFps(enabled: boolean): number | null {
-  const [fps, setFps] = useState<number | null>(null);
-  useEffect(() => {
-    if (!enabled) {
-      setFps(null);
-      return undefined;
-    }
-    let animationFrame = 0;
-    let frameCount = 0;
-    let startedAt = performance.now();
-    const measure = (now: number) => {
-      frameCount += 1;
-      const elapsed = now - startedAt;
-      if (elapsed >= 1000) {
-        setFps(Math.round((frameCount * 1000) / elapsed));
-        frameCount = 0;
-        startedAt = now;
-      }
-      animationFrame = requestAnimationFrame(measure);
-    };
-    animationFrame = requestAnimationFrame(measure);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [enabled]);
-  return fps;
+function formatTime(frame: number, fps: number): string {
+  const totalSeconds = frame / fps;
+  const seconds = Math.floor(totalSeconds);
+  const frames = frame % fps;
+  return `${String(seconds).padStart(2, "0")}:${String(frames).padStart(2, "0")}`;
 }
 
-function PlayerDemo({ pageId }: { pageId: GalleryPageId }) {
+function PlayerControls({ pageId }: { pageId: GalleryPageId }) {
   const video = galleryVideos[pageId];
   const controller = useStagecutPlayerController(video);
   const state = useStagecutPlayerState(controller);
-  const fps = useMeasuredFps(pageId === "performance" && state.status === "playing");
+  const isPlaying = state.status === "playing";
+  const activeSceneIndex = video.getActiveSceneIndex(state.currentFrame);
+  const activeScene = video.timeline.scenes[activeSceneIndex];
   const renderWindow = video.getRenderWindow(state.currentFrame);
-  const mountedLayers = renderWindow.reduce((count, scene) => count + scene.scene.layers.length, 0);
+
+  const seekScene = (index: number) => {
+    const scene = video.timeline.scenes[index];
+    if (scene) controller.seekToFrame(scene.startFrame);
+  };
 
   return (
-    <section className="demo-area">
-      <header className="demo-toolbar">
-        <div>
-          <span className="eyebrow">{pageId === "performance" ? "Instrumented example" : "Reference example"}</span>
-          <h1>{video.name}</h1>
-          <p>{video.description}</p>
+    <>
+      <section className="showcase-player">
+        <div className="player-frame">
+          <StagecutPlayer acknowledgeRemotionLicense controller={controller} surfaces={gallerySurfaces} video={video} />
+          <div className="player-corner-label">
+            <i /> LIVE DOM
+          </div>
         </div>
-        <div className="controls">
-          <button onClick={() => controller.play()} type="button">
-            Play
-          </button>
-          <button onClick={() => controller.pause()} type="button">
-            Pause
-          </button>
-          <button onClick={() => controller.seekToFrame(0)} type="button">
-            Reset
+        <div className="transport">
+          <div className="transport-navigation">
+            <button
+              aria-label="Previous scene"
+              onClick={() => seekScene(Math.max(0, activeSceneIndex - 1))}
+              type="button"
+            >
+              <GalleryIcon name="skip-back" size={15} />
+            </button>
+            <button
+              aria-label={isPlaying ? "Pause" : "Play"}
+              className={isPlaying ? "play-button pause-button" : "play-button"}
+              onClick={() => (isPlaying ? controller.pause() : controller.play())}
+              type="button"
+            >
+              <GalleryIcon className={isPlaying ? "" : "play-icon"} name={isPlaying ? "pause" : "play"} size={14} />
+            </button>
+            <button
+              aria-label="Next scene"
+              onClick={() => seekScene(Math.min(video.timeline.scenes.length - 1, activeSceneIndex + 1))}
+              type="button"
+            >
+              <GalleryIcon name="skip-forward" size={15} />
+            </button>
+          </div>
+          <span className="timecode">{formatTime(state.currentFrame, video.fps)}</span>
+          <input
+            aria-label="Timeline frame"
+            max={video.timeline.durationInFrames - 1}
+            min={0}
+            onChange={(event) => controller.seekToFrame(Number(event.currentTarget.value))}
+            style={
+              {
+                "--timeline-progress": `${(state.currentFrame / (video.timeline.durationInFrames - 1)) * 100}%`,
+              } as React.CSSProperties
+            }
+            type="range"
+            value={state.currentFrame}
+          />
+          <span className="timecode muted">{formatTime(video.timeline.durationInFrames - 1, video.fps)}</span>
+          <button
+            className="restart-button"
+            aria-label="Restart"
+            onClick={() => controller.seekToFrame(0)}
+            type="button"
+          >
+            <GalleryIcon name="restart" size={15} />
           </button>
         </div>
-      </header>
-      <div className="player-shell">
-        <StagecutPlayer acknowledgeRemotionLicense controller={controller} surfaces={gallerySurfaces} video={video} />
-      </div>
-      <div className="timeline">
-        <input
-          aria-label="Timeline frame"
-          max={video.timeline.durationInFrames - 1}
-          min={0}
-          onChange={(event) => controller.seekToFrame(Number(event.currentTarget.value))}
-          type="range"
-          value={state.currentFrame}
-        />
-        <div className="timeline-meta">
-          <span>
-            Frame {state.currentFrame} / {video.timeline.durationInFrames - 1}
-          </span>
-          <span>{state.activeSceneId}</span>
-          <span>{state.status}</span>
-        </div>
-      </div>
-      {pageId === "performance" ? (
-        <div className="metrics">
+      </section>
+      <section className="case-inspector">
+        <div className="scene-map">
+          <header>
+            <span>SCENE MAP</span>
+            <b>
+              {video.timeline.scenes.length} scenes · {video.fps} fps
+            </b>
+          </header>
           <div>
-            <strong>500</strong>
-            <span>scenes</span>
+            {video.timeline.scenes.map((scene, index) => (
+              <button
+                className={index === activeSceneIndex ? "active" : ""}
+                key={scene.scene.id}
+                onClick={() => seekScene(index)}
+                style={{ flexGrow: scene.scene.durationInFrames }}
+                title={scene.scene.name}
+                type="button"
+              >
+                <i />
+              </button>
+            ))}
+          </div>
+          <p>
+            {activeScene?.scene.name ?? "—"}
+            <span>{activeScene?.scene.id ?? "—"}</span>
+          </p>
+        </div>
+        <div className="runtime-stats">
+          <header>
+            <span>RUNTIME WINDOW</span>
+            <i>O(log n)</i>
+          </header>
+          <div>
+            <strong>{state.currentFrame}</strong>
+            <span>global frame</span>
           </div>
           <div>
             <strong>{renderWindow.length}</strong>
             <span>mounted scenes</span>
           </div>
           <div>
-            <strong>{mountedLayers}</strong>
-            <span>mounted surfaces</span>
+            <strong>{renderWindow.reduce((sum, item) => sum + item.scene.layers.length, 0)}</strong>
+            <span>DOM surfaces</span>
           </div>
-          <div>
-            <strong>{fps ?? "—"}</strong>
-            <span>browser fps</span>
-          </div>
+          <footer>
+            <i className={isPlaying ? "running" : ""} />
+            {state.status}
+          </footer>
         </div>
-      ) : null}
-    </section>
+      </section>
+    </>
   );
 }
 
-function JsonExport() {
-  const [expanded, setExpanded] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const json = useMemo(() => serializeStagecutProject(galleryProject), []);
-  const copy = async () => {
-    await navigator.clipboard.writeText(json);
-    setCopied(true);
-  };
-  const download = () => {
-    const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "stagecut-gallery.json";
-    anchor.click();
-    URL.revokeObjectURL(url);
-  };
+export function App() {
+  const routedPageId = useGalleryRoute();
+  const pageId = routedPageId in galleryVideos ? routedPageId : "task-flow";
+  const currentCase = cases.find((item) => item.id === pageId) ?? cases[0];
+  const video = galleryVideos[pageId];
   return (
-    <aside className="export-card">
-      <div>
-        <span className="eyebrow">Portable source</span>
-        <h2>Project JSON</h2>
-      </div>
-      <div className="export-actions">
-        <button onClick={() => setExpanded((value) => !value)} type="button">
-          {expanded ? "Hide" : "View"}
-        </button>
-        <button onClick={copy} type="button">
-          {copied ? "Copied" : "Copy"}
-        </button>
-        <button onClick={download} type="button">
-          Download
-        </button>
-      </div>
-      {expanded ? (
-        <pre>{json}</pre>
-      ) : (
-        <p>Validated schemaVersion 1 data. React components remain in the surface registry.</p>
-      )}
-    </aside>
-  );
-}
-
-function App() {
-  const pageId = useGalleryRoute();
-  return (
-    <div className="gallery-app">
-      <aside className="sidebar">
-        <a className="brand" href="#/basic">
-          <span>SC</span>
-          <strong>Stagecut</strong>
+    <div className="gallery-shell">
+      <aside className="gallery-sidebar">
+        <a className="gallery-brand" href="#/task-flow">
+          <span>
+            <GalleryIcon name="clapperboard" size={19} />
+          </span>
+          <div>
+            <b>stagecut</b>
+            <small>RUNTIME GALLERY</small>
+          </div>
         </a>
-        <p>High-performance Web DOM animation runtime.</p>
-        <nav aria-label="Demo pages">
-          {pages.map((page) => (
-            <a className={page.id === pageId ? "active" : ""} href={`#/${page.id}`} key={page.id}>
-              <strong>{page.label}</strong>
-              <small>{page.description}</small>
+        <nav aria-label="Production cases">
+          <div className="nav-label">PRODUCTION CASES</div>
+          {cases.map((item) => (
+            <a
+              className={item.id === pageId ? "active" : ""}
+              href={`#/${item.id}`}
+              key={item.id}
+              style={{ "--case-accent": item.accent } as React.CSSProperties}
+            >
+              <i>{item.index}</i>
+              <div>
+                <strong>{item.label}</strong>
+                <small>{item.summary}</small>
+              </div>
+              <span>
+                <GalleryIcon name="arrow-up-right" size={14} />
+              </span>
             </a>
           ))}
         </nav>
-        <footer>React 18/19 · SSR · Remotion adapter</footer>
+        <div className="sidebar-note">
+          <i>
+            <GalleryIcon name="layers" size={15} />
+          </i>
+          <div>
+            <b>Public API only</b>
+            <span>JSON model + typed surfaces</span>
+          </div>
+        </div>
+        <footer>
+          <span>v0.5 beta</span>
+          <b>React 18 / 19</b>
+        </footer>
       </aside>
-      <main>
-        <PlayerDemo key={pageId} pageId={pageId} />
-        <JsonExport />
+      <main className="gallery-main">
+        <header className="gallery-header">
+          <div>
+            <span>CASE {currentCase?.index} / 03</span>
+            <h1>{video.name}</h1>
+            <p>{video.description}</p>
+          </div>
+          <div className="header-badges">
+            <span>1440 × 900</span>
+            <span>{video.fps} FPS</span>
+            <span>{video.timeline.durationInFrames} FRAMES</span>
+          </div>
+        </header>
+        <PlayerControls key={pageId} pageId={pageId} />
       </main>
     </div>
   );
 }
-
-createRoot(document.getElementById("root") as HTMLElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);

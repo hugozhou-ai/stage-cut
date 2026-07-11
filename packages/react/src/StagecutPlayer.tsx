@@ -108,7 +108,11 @@ export function StagecutPlayer({
     };
   }, [controller, isClientReady]);
 
-  const mergedStyle = { aspectRatio: `${video.stage.width} / ${video.stage.height}`, ...style };
+  const mergedStyle = {
+    aspectRatio: `${video.stage.width} / ${video.stage.height}`,
+    width: "100%",
+    ...style,
+  };
   if (!isClientReady) {
     return (
       <div

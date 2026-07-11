@@ -337,6 +337,7 @@ describe("StagecutPlayer", () => {
     const html = renderToString(<StagecutPlayer surfaces={surfaces} video={video} />);
     expect(html).toContain('data-stagecut-placeholder="true"');
     expect(html).toContain("1280 / 720");
+    expect(html).toContain("width:100%");
   });
 
   it("attaches the internal adapter, forwards events, and cleans up", () => {
