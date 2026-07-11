@@ -8,13 +8,13 @@ import {
   safeParseStagecutProject,
   type TransitionName,
   type VideoDefinition,
-} from "@stagecut/core";
+} from "@stage-cut/core";
 import {
   StagecutPlayer,
   type SurfaceComponentMap,
   useStagecutPlayerController,
   useStagecutPlayerState,
-} from "@stagecut/react-player";
+} from "@stage-cut/react-player";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   cloneProject,

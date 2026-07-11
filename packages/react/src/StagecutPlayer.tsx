@@ -1,6 +1,6 @@
 import type { PlayerRef } from "@remotion/player";
 import { Player } from "@remotion/player";
-import type { CompiledStagecutVideo } from "@stagecut/core";
+import type { CompiledStagecutVideo } from "@stage-cut/core";
 import type { CSSProperties, Ref } from "react";
 import { useEffect, useImperativeHandle, useMemo, useRef, useSyncExternalStore } from "react";
 import { useStagecutPlayerController } from "./hooks";

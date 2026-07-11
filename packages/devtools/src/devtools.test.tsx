@@ -1,4 +1,4 @@
-import { defineStagecutProject, type SceneDefinition } from "@stagecut/core";
+import { defineStagecutProject, type SceneDefinition } from "@stage-cut/core";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -26,7 +26,7 @@ const controller = {
   stepByFrames: vi.fn(),
 };
 
-vi.mock("@stagecut/react-player", () => ({
+vi.mock("@stage-cut/react-player", () => ({
   StagecutPlayer: ({ video }: { video: { id: string } }) => <div data-testid="player">{video.id}</div>,
   useStagecutPlayerController: () => controller,
   useStagecutPlayerState: () => ({

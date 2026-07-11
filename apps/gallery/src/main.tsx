@@ -1,4 +1,4 @@
-import { StagecutPlayer, useStagecutPlayerController, useStagecutPlayerState } from "@stagecut/react-player";
+import { StagecutPlayer, useStagecutPlayerController, useStagecutPlayerState } from "@stage-cut/react-player";
 import { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import stagecutLogoUrl from "./assets/stage-cut.png";
 import { ApplicationDialogSurface } from "./cases/applicationDialog";

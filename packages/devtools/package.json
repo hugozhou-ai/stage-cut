@@ -1,5 +1,5 @@
 {
-  "name": "@stagecut/devtools",
+  "name": "@stage-cut/devtools",
   "version": "0.5.0-beta.2",
   "description": "In-page preview and debugging studio for Stagecut projects.",
   "type": "module",
@@ -49,8 +49,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@stagecut/core": "workspace:^",
-    "@stagecut/react-player": "workspace:^"
+    "@stage-cut/core": "workspace:^",
+    "@stage-cut/react-player": "workspace:^"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.1",

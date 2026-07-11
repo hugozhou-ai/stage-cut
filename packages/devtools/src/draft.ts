@@ -5,7 +5,7 @@ import type {
   StagecutProjectDefinition,
   TransitionConfig,
   VideoDefinition,
-} from "@stagecut/core";
+} from "@stage-cut/core";
 
 export interface DevtoolsChangeOperation {
   after?: unknown;

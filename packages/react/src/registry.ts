@@ -1,4 +1,4 @@
-import type { StagecutProjectDefinition } from "@stagecut/core";
+import type { StagecutProjectDefinition } from "@stage-cut/core";
 import type { SurfaceComponentMap, SurfaceRegistryForProject } from "./types";
 
 export function defineSurfaceRegistry<const TProject extends StagecutProjectDefinition>(

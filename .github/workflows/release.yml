@@ -26,12 +26,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:release
       - run: pnpm changeset version
-      - run: pnpm --filter @stagecut/core run build && cd packages/core && npm publish
+      - run: pnpm --filter @stage-cut/core run build && cd packages/core && npm publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: pnpm --filter @stagecut/react-player run build && cd packages/react && npm publish
+      - run: pnpm --filter @stage-cut/react-player run build && cd packages/react && npm publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: pnpm --filter @stagecut/devtools run build && cd packages/devtools && npm publish
+      - run: pnpm --filter @stage-cut/devtools run build && cd packages/devtools && npm publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

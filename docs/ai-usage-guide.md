@@ -14,7 +14,7 @@ Stagecut does:
 - Compile sequential scenes and overlapping transitions into a frame timeline.
 - Render only the active scene and, during a transition, its outgoing predecessor.
 - Expose playback through a Stagecut-owned controller.
-- Provide development-only timeline editing and debugging through `@stagecut/devtools`.
+- Provide development-only timeline editing and debugging through `@stage-cut/devtools`.
 
 Stagecut does not:
 
@@ -34,7 +34,7 @@ Stagecut does not:
 | `apps/gallery` | Production-style examples built only with public Stagecut APIs. |
 
 When changing behavior, put it in the package that owns that responsibility. Do not add reusable runtime behavior to
-the Gallery and do not add Devtools UI to `@stagecut/react-player`.
+the Gallery and do not add Devtools UI to `@stage-cut/react-player`.
 
 ## 3. Mental Model
 
@@ -62,16 +62,16 @@ Important distinctions:
 Runtime application:
 
 ```bash
-pnpm add @stagecut/core @stagecut/react-player react react-dom
+pnpm add @stage-cut/core @stage-cut/react-player react react-dom
 ```
 
 Optional development Studio:
 
 ```bash
-pnpm add -D @stagecut/devtools
+pnpm add -D @stage-cut/devtools
 ```
 
-`@stagecut/react-player` uses Remotion internally. Review `docs/remotion-license.md` and pass
+`@stage-cut/react-player` uses Remotion internally. Review `docs/remotion-license.md` and pass
 `acknowledgeRemotionLicense` where appropriate.
 
 ## 5. Recommended File Layout
@@ -98,7 +98,7 @@ Never mutate the returned project.
 
 ```tsx
 // project.ts
-import { compileStagecutVideo, defineStagecutProject } from "@stagecut/core";
+import { compileStagecutVideo, defineStagecutProject } from "@stage-cut/core";
 
 export const project = defineStagecutProject({
   schemaVersion: 1,
@@ -177,7 +177,7 @@ checks that the registry contains exactly the declared Surface IDs.
 
 ```tsx
 // surfaces.tsx
-import { defineSurfaceRegistry } from "@stagecut/react-player";
+import { defineSurfaceRegistry } from "@stage-cut/react-player";
 import { project } from "./project";
 
 export const surfaces = defineSurfaceRegistry(project, {
@@ -227,7 +227,7 @@ Surface rules:
 
 ```tsx
 // Preview.tsx
-import { StagecutPlayer } from "@stagecut/react-player";
+import { StagecutPlayer } from "@stage-cut/react-player";
 import { mainVideo } from "./project";
 import { surfaces } from "./surfaces";
 
@@ -258,7 +258,7 @@ import {
   StagecutPlayer,
   useStagecutPlayerController,
   useStagecutPlayerState,
-} from "@stagecut/react-player";
+} from "@stage-cut/react-player";
 import { mainVideo } from "./project";
 import { surfaces } from "./surfaces";
 
@@ -301,7 +301,7 @@ rerender every frame.
 Do not pass untrusted or external JSON directly to `defineStagecutProject()` or the compiler. Parse it explicitly:
 
 ```ts
-import { safeParseStagecutProject } from "@stagecut/core";
+import { safeParseStagecutProject } from "@stage-cut/core";
 
 function readExternalProject(input: unknown) {
   const result = safeParseStagecutProject(input);
@@ -344,7 +344,7 @@ durations; use `compiledVideo.timeline.durationInFrames`.
 Mount Devtools once near the application root and require an explicit development flag:
 
 ```tsx
-import { StagecutDevtools } from "@stagecut/devtools";
+import { StagecutDevtools } from "@stage-cut/devtools";
 
 <StagecutDevtools
   acknowledgeRemotionLicense

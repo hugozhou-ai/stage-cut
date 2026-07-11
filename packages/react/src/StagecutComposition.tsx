@@ -1,4 +1,4 @@
-import { type CompiledScene, type CompiledStagecutVideo, progressForRange } from "@stagecut/core";
+import { type CompiledScene, type CompiledStagecutVideo, progressForRange } from "@stage-cut/core";
 import type { CSSProperties } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { resolveTransitionStyle } from "./transitionStyles";

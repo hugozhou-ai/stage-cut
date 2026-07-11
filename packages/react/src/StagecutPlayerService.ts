@@ -1,4 +1,4 @@
-import type { CompiledStagecutVideo } from "@stagecut/core";
+import type { CompiledStagecutVideo } from "@stage-cut/core";
 import type { StagecutPlayerPlaybackState, StagecutPlayerState, StagecutPlayerStateListener } from "./types";
 
 interface StagecutPlaybackAdapter {
