@@ -28,7 +28,7 @@ pnpm dev
 
 Open the URL printed by Vite. The gallery contains three production-style cases built with StageCut's public API. These cases are reconstructed from real screens on [tutti.sh](https://tutti.sh/); see [tutti-os/tutti](https://github.com/tutti-os/tutti) for the source project.
 
-### Application Creation Dialog
+### Demo: Application Creation Dialog
 
 [![Application Creation Dialog animation](docs/assets/gallery/application-dialog.gif)](docs/assets/gallery/application-dialog.mp4)
 

@@ -28,7 +28,7 @@ pnpm dev
 
 打开 Vite 打印的 URL。画廊包含三个基于 StageCut 公开 API 构建的生产级示例。这些案例改编自 [tutti.sh](https://tutti.sh/) 的真实界面；源项目见 [tutti-os/tutti](https://github.com/tutti-os/tutti)。
 
-### Application Creation Dialog
+### 演示案例：Application Creation Dialog
 
 [![Application Creation Dialog 动画](docs/assets/gallery/application-dialog.gif)](docs/assets/gallery/application-dialog.mp4)
 
