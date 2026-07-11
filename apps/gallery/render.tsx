@@ -1,5 +1,5 @@
 import "@fontsource-variable/lexend";
-import { StagecutComposition } from "@stagecut/react";
+import { StagecutComposition } from "@stagecut/react-player";
 import { Composition, registerRoot } from "remotion";
 import { type GalleryPageId, gallerySurfaces, galleryVideos } from "./src/galleryProject";
 import "./src/styles.css";

@@ -17,7 +17,7 @@
     "paths": {
       "@stagecut/core": ["packages/core/src/index.ts"],
       "@stagecut/devtools": ["packages/devtools/src/index.ts"],
-      "@stagecut/react": ["packages/react/src/index.ts"]
+      "@stagecut/react-player": ["packages/react/src/index.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

@@ -31,16 +31,16 @@ StageCut is designed for browser playback only. It does not provide MP4/WebM exp
 ## Install
 
 ```bash
-pnpm add @stagecut/core @stagecut/react react react-dom
+pnpm add @stagecut/core @stagecut/react-player react react-dom
 ```
 
-`@stagecut/react` uses Remotion internally. Review [Remotion licensing](docs/remotion-license.md) and explicitly acknowledge it on the player when appropriate.
+`@stagecut/react-player` uses Remotion internally. Review [Remotion licensing](docs/remotion-license.md) and explicitly acknowledge it on the player when appropriate.
 
 ## Quick start
 
 ```tsx
 import { compileStagecutVideo, defineStagecutProject } from "@stagecut/core";
-import { defineSurfaceRegistry, StagecutPlayer } from "@stagecut/react";
+import { defineSurfaceRegistry, StagecutPlayer } from "@stagecut/react-player";
 
 const project = defineStagecutProject({
   schemaVersion: 1,

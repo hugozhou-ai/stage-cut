@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@stagecut/core": "workspace:^",
-    "@stagecut/react": "workspace:^"
+    "@stagecut/react-player": "workspace:^"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.1",

@@ -34,7 +34,7 @@ Stagecut does not:
 | `apps/gallery` | Production-style examples built only with public Stagecut APIs. |
 
 When changing behavior, put it in the package that owns that responsibility. Do not add reusable runtime behavior to
-the Gallery and do not add Devtools UI to `@stagecut/react`.
+the Gallery and do not add Devtools UI to `@stagecut/react-player`.
 
 ## 3. Mental Model
 
@@ -62,7 +62,7 @@ Important distinctions:
 Runtime application:
 
 ```bash
-pnpm add @stagecut/core @stagecut/react react react-dom
+pnpm add @stagecut/core @stagecut/react-player react react-dom
 ```
 
 Optional development Studio:
@@ -71,7 +71,7 @@ Optional development Studio:
 pnpm add -D @stagecut/devtools
 ```
 
-`@stagecut/react` uses Remotion internally. Review `docs/remotion-license.md` and pass
+`@stagecut/react-player` uses Remotion internally. Review `docs/remotion-license.md` and pass
 `acknowledgeRemotionLicense` where appropriate.
 
 ## 5. Recommended File Layout
@@ -177,7 +177,7 @@ checks that the registry contains exactly the declared Surface IDs.
 
 ```tsx
 // surfaces.tsx
-import { defineSurfaceRegistry } from "@stagecut/react";
+import { defineSurfaceRegistry } from "@stagecut/react-player";
 import { project } from "./project";
 
 export const surfaces = defineSurfaceRegistry(project, {
@@ -227,7 +227,7 @@ Surface rules:
 
 ```tsx
 // Preview.tsx
-import { StagecutPlayer } from "@stagecut/react";
+import { StagecutPlayer } from "@stagecut/react-player";
 import { mainVideo } from "./project";
 import { surfaces } from "./surfaces";
 
@@ -258,7 +258,7 @@ import {
   StagecutPlayer,
   useStagecutPlayerController,
   useStagecutPlayerState,
-} from "@stagecut/react";
+} from "@stagecut/react-player";
 import { mainVideo } from "./project";
 import { surfaces } from "./surfaces";
 
