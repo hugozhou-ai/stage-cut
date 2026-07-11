@@ -18,7 +18,7 @@ StageCut is designed for browser playback only. It does not provide MP4/WebM exp
 
 Explore interactive, production-style cases before installing or running StageCut locally: **[Open the Live Production Gallery →](https://hugozhou-ai.github.io/stage-cut/)**
 
-The gallery contains three production-style cases built with StageCut's public API. These cases are reconstructed from real screens on [tutti.sh](https://tutti.sh/); see [tutti-os/tutti](https://github.com/tutti-os/tutti) for the source project.
+The gallery contains three production-style cases built with StageCut's public API, reconstructed from real screens on tutti.sh.
 
 ### Demo: Application Creation Dialog
 
