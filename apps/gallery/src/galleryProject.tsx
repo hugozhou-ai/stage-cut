@@ -44,7 +44,7 @@ export const galleryProject = defineStagecutProject({
       fps: 30,
       id: "task-flow",
       name: "Cross-functional Task Flow",
-      playback: { autoPlay: true, defaultStatus: "playing", loop: true },
+      playback: { autoPlay: false, defaultStatus: "paused", loop: true },
       scenes: [
         { durationInFrames: 42, id: "prompt-typing", layers: [layer("task-flow", "typing")], name: "Type the task" },
         {
@@ -81,7 +81,7 @@ export const galleryProject = defineStagecutProject({
       fps: 30,
       id: "message-cluster",
       name: "Project Activity Cluster",
-      playback: { autoPlay: true, defaultStatus: "playing", loop: true },
+      playback: { autoPlay: false, defaultStatus: "paused", loop: true },
       scenes: [
         {
           durationInFrames: 48,
@@ -116,7 +116,7 @@ export const galleryProject = defineStagecutProject({
       fps: 30,
       id: "application-dialog",
       name: "Application Creation Dialog",
-      playback: { autoPlay: true, defaultStatus: "playing", loop: true },
+      playback: { autoPlay: false, defaultStatus: "paused", loop: true },
       scenes: [
         {
           durationInFrames: 34,

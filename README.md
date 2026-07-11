@@ -1,3 +1,7 @@
+<p align="center">
+  <img alt="Stagecut logo" src="apps/gallery/src/assets/stage-cut.png" width="160" />
+</p>
+
 # Stagecut
 
 Stagecut is a high-performance React runtime for playing deterministic DOM animations in web pages. Projects are portable JSON; React surface components provide the visuals; a compiled scene timeline keeps playback work bounded.
@@ -60,7 +64,7 @@ export function Preview() {
 }
 ```
 
-Surface components receive `{ input, context }`. Input is JSON data from the layer; context contains `globalFrame`, `localFrame`, `progress`, `fps`, `sceneId`, and `layerId`. Surface interaction is intentionally disabled so playback stays deterministic.
+Surface components receive `{ input, context }`. Input is JSON data from the layer; context contains `globalFrame`, `localFrame`, `progress`, `fps`, `sceneId`, and `layerId`. Surface interaction is disabled by default so playback stays deterministic. Pass `interactive` to `StagecutPlayer` when a browser experience should expose the real buttons, links, inputs, selection, and focus behavior rendered by a surface. Only the active scene accepts pointer events during a transition.
 
 ## External JSON
 

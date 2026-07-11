@@ -82,12 +82,16 @@ function pointOnPath(agent: Agent, progress: number): { x: number; y: number } {
 function AgentNode({
   agent,
   messagePlacement,
+  onSelect,
   reveal,
+  selected,
   showMessage,
 }: {
   agent: Agent;
   messagePlacement: "below" | "left" | "right";
+  onSelect?: () => void;
   reveal: number;
+  selected: boolean;
   showMessage: boolean;
 }) {
   const progress = easeOutCubic(reveal);
@@ -95,8 +99,12 @@ function AgentNode({
   const messageTransform =
     messagePlacement === "below" ? `translate(-50%, ${messageOffset}px)` : `translateY(${messageOffset}px)`;
   return (
-    <div
-      className="task-agent"
+    <button
+      aria-label={`Inspect ${agent.label} workstream`}
+      aria-pressed={selected}
+      className={`task-agent ${selected ? "selected" : ""}`}
+      disabled={reveal <= 0}
+      onClick={onSelect}
       style={
         {
           "--agent-accent": agent.accent,
@@ -105,6 +113,7 @@ function AgentNode({
           transform: `translate(-50%, ${mix(28, 0, progress)}px) scale(${mix(0.74, 1, progress)})`,
         } as CSSProperties
       }
+      type="button"
     >
       <div className="task-agent-orbit">
         <span>
@@ -119,11 +128,19 @@ function AgentNode({
       >
         {agent.message}
       </div>
-    </div>
+    </button>
   );
 }
 
-export function TaskFlowSurface({ context, input }: SurfaceComponentProps) {
+export function TaskFlowSurface({
+  context,
+  input,
+  onAction,
+  selectedAgent,
+}: SurfaceComponentProps & {
+  onAction?: (action: string, value?: string) => void;
+  selectedAgent?: string;
+}) {
   const phase = text(input, "phase", "typing");
   const activeAgent = number(input, "activeAgent", -1);
   const visibleAgents = number(input, "visibleAgents", 0);
@@ -198,7 +215,9 @@ export function TaskFlowSurface({ context, input }: SurfaceComponentProps) {
             agent={agent}
             key={agent.label}
             messagePlacement={index === 0 ? "left" : index === agents.length - 1 ? "right" : "below"}
+            onSelect={() => onAction?.("agent", agent.label)}
             reveal={isVisible ? (entering ? progress : 1) : 0}
+            selected={selectedAgent === agent.label}
             showMessage={phase === "messages" && index < Math.ceil(progress * agents.length)}
           />
         );

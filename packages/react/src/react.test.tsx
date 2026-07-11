@@ -175,6 +175,28 @@ describe("surface registry", () => {
   });
 });
 
+describe("StagecutComposition", () => {
+  it("keeps surfaces deterministic by default and explicitly enables active-scene interaction", () => {
+    const { surfaces, video } = createRuntime();
+    const deterministic = render(<StagecutComposition surfaces={surfaces} video={video} />);
+    expect(screen.getAllByTestId("absolute-fill")[0]?.style.pointerEvents).toBe("none");
+    deterministic.unmount();
+
+    const interactive = render(<StagecutComposition interactive surfaces={surfaces} video={video} />);
+    for (const element of screen.getAllByTestId("absolute-fill")) {
+      expect(element.style.pointerEvents).toBe("auto");
+    }
+    interactive.unmount();
+
+    remotionState.frame = 20;
+    const transition = render(<StagecutComposition interactive surfaces={surfaces} video={video} />);
+    const composition = screen.getAllByTestId("absolute-fill")[0];
+    const scenes = Array.from(composition?.children ?? []) as HTMLElement[];
+    expect(scenes.map((scene) => scene.style.pointerEvents)).toEqual(["none", "auto"]);
+    transition.unmount();
+  });
+});
+
 describe("StagecutPlayerService", () => {
   it("synchronizes active scene when attaching at a non-zero frame", () => {
     const { video } = createRuntime();
@@ -352,6 +374,7 @@ describe("StagecutPlayer", () => {
           className="demo"
           controller={controller}
           controls
+          interactive
           onError={onError}
           style={{ width: 640 }}
           surfaces={surfaces}
@@ -361,7 +384,11 @@ describe("StagecutPlayer", () => {
     );
     expect(screen.getByTestId("mock-remotion-player").classList.contains("demo")).toBe(true);
     expect(controller.getState().isReady).toBe(true);
-    expect(playerState.props).toMatchObject({ acknowledgeRemotionLicense: true, controls: true });
+    expect(playerState.props).toMatchObject({
+      acknowledgeRemotionLicense: true,
+      controls: true,
+      inputProps: { interactive: true },
+    });
     act(() => emit("play"));
     expect(controller.getState().status).toBe("playing");
     act(() => emit("waiting"));

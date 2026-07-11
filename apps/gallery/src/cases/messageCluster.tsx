@@ -90,7 +90,21 @@ const grouped = [
   { x: 620, y: 490 },
 ];
 
-function Card({ card, index, phase, progress }: { card: MessageCard; index: number; phase: string; progress: number }) {
+function Card({
+  card,
+  index,
+  onSelect,
+  phase,
+  progress,
+  selected,
+}: {
+  card: MessageCard;
+  index: number;
+  onSelect?: () => void;
+  phase: string;
+  progress: number;
+  selected: boolean;
+}) {
   const from = scatter[index] as (typeof scatter)[number];
   const entrance = phase === "scatter" ? easeOutCubic(progress * 1.8 - from.delay) : 1;
   const alignProgress = phase === "align" ? easeInOutCubic(progress) : phase === "scatter" ? 0 : 1;
@@ -105,8 +119,11 @@ function Card({ card, index, phase, progress }: { card: MessageCard; index: numb
   const opacity = phase === "scatter" ? entrance : phase === "menu" ? (1 - easeOutCubic(progress)) * menuExit : 1;
 
   return (
-    <article
-      className="message-card"
+    <button
+      aria-label={`Inspect ${card.title} update`}
+      aria-pressed={selected}
+      className={`message-card ${selected ? "selected" : ""}`}
+      onClick={onSelect}
       style={
         {
           "--card-accent": card.accent,
@@ -114,10 +131,11 @@ function Card({ card, index, phase, progress }: { card: MessageCard; index: numb
           left: x,
           opacity,
           top: y,
-          transform: `translate(-50%, -50%) rotate(${mix(from.rotate, 0, alignProgress)}deg) scale(${scale})`,
+          transform: `translate(-50%, -50%) rotate(${mix(from.rotate, 0, alignProgress)}deg) scale(${scale * (selected ? 1.08 : 1)})`,
           width: 360,
         } as CSSProperties
       }
+      type="button"
     >
       <div className="message-avatar">
         <GalleryIcon name={card.icon} size={18} />
@@ -133,11 +151,19 @@ function Card({ card, index, phase, progress }: { card: MessageCard; index: numb
           {card.source}
         </footer>
       </div>
-    </article>
+    </button>
   );
 }
 
-export function MessageClusterSurface({ context, input }: SurfaceComponentProps) {
+export function MessageClusterSurface({
+  context,
+  input,
+  onAction,
+  selectedCard,
+}: SurfaceComponentProps & {
+  onAction?: (action: string, value?: string) => void;
+  selectedCard?: string;
+}) {
   const phase = text(input, "phase", "scatter");
   const progress = context.progress;
   const menuExit = phase === "menu" ? 1 - easeInOutCubic((progress - 0.72) / 0.28) : 1;
@@ -161,30 +187,38 @@ export function MessageClusterSurface({ context, input }: SurfaceComponentProps)
           </header>
         </div>
         {cards.map((card, index) => (
-          <Card card={card} index={index} key={card.title} phase={phase} progress={progress} />
+          <Card
+            card={card}
+            index={index}
+            key={card.title}
+            onSelect={() => onAction?.("card", card.title)}
+            phase={phase}
+            progress={progress}
+            selected={selectedCard === card.title}
+          />
         ))}
         <div
           className="cluster-menu"
           style={{ opacity: menuProgress * menuExit, transform: `translateY(${mix(14, 0, menuProgress)}px)` }}
         >
-          <span>
+          <button onClick={() => onAction?.("mark-read")} type="button">
             <i>
               <GalleryIcon name="check" size={14} />
             </i>{" "}
             Mark all as read
-          </span>
-          <span>
+          </button>
+          <button onClick={() => onAction?.("group")} type="button">
             <i>
               <GalleryIcon name="workflow" size={14} />
             </i>{" "}
             Group by project
-          </span>
-          <span>
+          </button>
+          <button onClick={() => onAction?.("overview")} type="button">
             <i>
               <GalleryIcon name="arrow-up-right" size={14} />
             </i>{" "}
             Open project overview
-          </span>
+          </button>
         </div>
       </main>
     </div>
