@@ -22,9 +22,9 @@ async function packPackages() {
   run("pnpm", ["--filter", "@stage-cut/react-player", "pack", "--pack-destination", artifacts], root);
   run("pnpm", ["--filter", "@stage-cut/devtools", "pack", "--pack-destination", artifacts], root);
   const files = await readdir(artifacts);
-  const core = files.find((file) => file.startsWith("stagecut-core-"));
-  const react = files.find((file) => file.startsWith("stagecut-react-"));
-  const devtools = files.find((file) => file.startsWith("stagecut-devtools-"));
+  const core = files.find((file) => file.startsWith("stage-cut-core-"));
+  const react = files.find((file) => file.startsWith("stage-cut-react-player-"));
+  const devtools = files.find((file) => file.startsWith("stage-cut-devtools-"));
   if (!core || !react || !devtools) {
     throw new Error(`Stagecut package tarballs were not created: ${JSON.stringify({ files })}`);
   }
