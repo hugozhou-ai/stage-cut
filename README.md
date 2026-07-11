@@ -125,6 +125,8 @@ pnpm test:coverage
 ```
 
 See [architecture](docs/architecture.md), [performance](docs/performance.md), and the [0.1 migration guide](docs/migration-0.1.md).
+For a task-oriented reference designed for developers and coding Agents, see the
+[AI-friendly project usage guide](docs/ai-usage-guide.md).
 
 Maintainers should follow [RELEASING.md](RELEASING.md); publishing is manually approved and never runs automatically on a branch push.
 
