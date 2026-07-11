@@ -18,17 +18,11 @@ export interface TransitionConfig {
   kind: TransitionName;
 }
 
-export interface FrameTransitionOverrides {
-  in?: TransitionConfig;
-  out?: TransitionConfig;
-}
-
 export interface SurfaceDefinition<TMetadata extends JsonObject = JsonObject> {
   description?: string;
   id: string;
   metadata?: TMetadata;
   name: string;
-  propsSchema?: JsonObject;
 }
 
 export interface StageDefinition<TMetadata extends JsonObject = JsonObject> {
@@ -40,28 +34,23 @@ export interface StageDefinition<TMetadata extends JsonObject = JsonObject> {
   width: number;
 }
 
-export interface VideoFrameOptions<
+export interface LayerDefinition<
   TInputProps extends JsonObject = JsonObject,
   TMetadata extends JsonObject = JsonObject,
 > {
-  durationInFrames: number;
   id: string;
   inputProps?: TInputProps;
   metadata?: TMetadata;
   surfaceId: string;
-  transition?: FrameTransitionOverrides | TransitionConfig;
 }
 
-export interface VideoFrameDefinition<
-  TInputProps extends JsonObject = JsonObject,
-  TMetadata extends JsonObject = JsonObject,
-> {
+export interface SceneDefinition<TMetadata extends JsonObject = JsonObject> {
   durationInFrames: number;
   id: string;
-  inputProps: TInputProps;
+  layers: readonly LayerDefinition[];
   metadata?: TMetadata;
-  surfaceId: string;
-  transition?: FrameTransitionOverrides;
+  name?: string;
+  transitionToNext?: TransitionConfig;
 }
 
 export interface PlaybackOptions {
@@ -71,54 +60,75 @@ export interface PlaybackOptions {
   loop?: boolean;
 }
 
-export interface PlayerVideoOptions<TMetadata extends JsonObject = JsonObject> {
+export interface VideoDefinition<TMetadata extends JsonObject = JsonObject> {
   clipContent?: boolean;
+  defaultTransition?: TransitionConfig;
   description?: string;
   fps: number;
-  frames: VideoFrameDefinition[];
-  height: number;
   id: string;
   metadata?: TMetadata;
   name: string;
   playback?: PlaybackOptions;
+  scenes: readonly SceneDefinition[];
   stageId: string;
-  transition?: TransitionConfig;
-  width: number;
 }
 
-export interface TimelineEdge {
+export interface SceneTransitionEdge {
   durationInFrames: number;
-  fromFrameId: string;
-  toFrameId: string;
+  fromSceneId: string;
+  toSceneId: string;
   transition: Required<TransitionConfig>;
 }
 
-export interface TimelineItem {
+export interface CompiledScene {
   endFrame: number;
-  frameId: string;
+  inTransition?: SceneTransitionEdge;
   index: number;
-  inTransition?: TimelineEdge;
-  outTransition?: TimelineEdge;
+  outTransition?: SceneTransitionEdge;
+  scene: Readonly<SceneDefinition>;
   startFrame: number;
 }
 
-export interface ResolvedTimeline {
+export interface CompiledTimeline {
   durationInFrames: number;
-  edges: TimelineEdge[];
-  items: TimelineItem[];
+  edges: readonly SceneTransitionEdge[];
+  scenes: readonly CompiledScene[];
 }
 
-export interface StagecutProjectOptions<TMetadata extends JsonObject = JsonObject> {
+export interface StagecutProjectDefinition<TMetadata extends JsonObject = JsonObject> {
   description?: string;
   id: string;
   metadata?: TMetadata;
   name: string;
-  stages: StageDefinition[];
-  surfaces: SurfaceDefinition[];
-  videos: PlayerVideoOptions[];
+  schemaVersion: 1;
+  stages: readonly StageDefinition[];
+  surfaces: readonly SurfaceDefinition[];
+  videos: readonly VideoDefinition[];
 }
 
-export interface StagecutProjectJson<TMetadata extends JsonObject = JsonObject>
-  extends StagecutProjectOptions<TMetadata> {
-  schemaVersion: 1;
+export interface CompiledStagecutVideo<TMetadata extends JsonObject = JsonObject> {
+  readonly clipContent: boolean;
+  readonly defaultTransition: Required<TransitionConfig>;
+  readonly description?: string;
+  readonly fps: number;
+  readonly id: string;
+  readonly metadata?: Readonly<TMetadata>;
+  readonly name: string;
+  readonly playback: Required<PlaybackOptions>;
+  readonly projectId: string;
+  readonly stage: Readonly<StageDefinition>;
+  readonly timeline: CompiledTimeline;
+  readonly video: Readonly<VideoDefinition<TMetadata>>;
+  getActiveSceneIndex(frame: number): number;
+  getRenderWindow(frame: number): readonly CompiledScene[];
 }
+
+export interface StagecutValidationIssue {
+  code: string;
+  message: string;
+  path: string;
+}
+
+export type StagecutParseResult =
+  | { data: StagecutProjectDefinition; success: true }
+  | { error: import("./validation").StagecutValidationError; success: false };

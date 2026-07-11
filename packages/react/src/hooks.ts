@@ -1,15 +1,15 @@
-import type { PlayerVideo } from "@stagecut/core";
+import type { CompiledStagecutVideo } from "@stagecut/core";
 import { useMemo, useSyncExternalStore } from "react";
 import { createStagecutPlayerController, type StagecutPlayerService } from "./StagecutPlayerService";
 import type { StagecutPlayerPlaybackState, StagecutPlayerState } from "./types";
 
-export function useStagecutPlayerController(video: PlayerVideo): StagecutPlayerService {
+export function useStagecutPlayerController(video: CompiledStagecutVideo): StagecutPlayerService {
   return useMemo(() => createStagecutPlayerController(video), [video]);
 }
 
 function arePlayerStatesEqual(current: StagecutPlayerState, next: StagecutPlayerState): boolean {
   return (
-    current.activeFrameId === next.activeFrameId &&
+    current.activeSceneId === next.activeSceneId &&
     current.currentFrame === next.currentFrame &&
     current.durationInFrames === next.durationInFrames &&
     current.isReady === next.isReady &&

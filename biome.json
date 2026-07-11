@@ -1,7 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": ["**", "!**/dist", "!**/coverage", "!**/.artifacts"]
   },
   "formatter": {
     "enabled": true,
@@ -11,7 +12,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "preset": "recommended"
     }
   }
 }

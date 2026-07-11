@@ -1,95 +1,113 @@
-import type { PlayerVideo } from "@stagecut/core";
-import type { SyntheticEvent } from "react";
-import type {
-  AttachablePlayer,
-  StagecutPlayerPlaybackState,
-  StagecutPlayerState,
-  StagecutPlayerStateListener,
-} from "./types";
+import type { CompiledStagecutVideo } from "@stagecut/core";
+import type { StagecutPlayerPlaybackState, StagecutPlayerState, StagecutPlayerStateListener } from "./types";
 
-function createInitialState(video: PlayerVideo): StagecutPlayerState {
+interface StagecutPlaybackAdapter {
+  getCurrentFrame(): number;
+  isPlaying(): boolean;
+  pause(): void;
+  play(): void;
+  seekTo(frame: number): void;
+}
+
+function activeSceneId(video: CompiledStagecutVideo, frame: number): string | null {
+  return video.timeline.scenes[video.getActiveSceneIndex(frame)]?.scene.id ?? null;
+}
+
+function createInitialState(video: CompiledStagecutVideo): StagecutPlayerState {
   return {
-    activeFrameId: video.getActiveFrameId(0),
+    activeSceneId: activeSceneId(video, 0),
     currentFrame: 0,
-    durationInFrames: video.durationInFrames,
+    durationInFrames: video.timeline.durationInFrames,
     isReady: false,
     lastError: null,
-    status: video.playback.defaultStatus === "playing" ? "playing" : "paused",
+    status: "idle",
   };
 }
 
 export class StagecutPlayerService {
   private readonly listeners = new Set<StagecutPlayerStateListener>();
+  private player: StagecutPlaybackAdapter | null = null;
   private readonly playbackListeners = new Set<StagecutPlayerStateListener>();
-  private player: AttachablePlayer | null = null;
-  readonly dataStore: StagecutPlayerState;
-  readonly video: PlayerVideo;
+  private readonly state: StagecutPlayerState;
+  readonly video: CompiledStagecutVideo;
 
-  constructor(video: PlayerVideo) {
+  constructor(video: CompiledStagecutVideo) {
     this.video = video;
-    this.dataStore = createInitialState(video);
+    this.state = createInitialState(video);
   }
 
-  attachPlayer(player: AttachablePlayer): void {
+  /** @internal Used by the Stagecut React adapter. */
+  attachPlayer(player: StagecutPlaybackAdapter): void {
+    const currentFrame = this.validateObservedFrame(player.getCurrentFrame());
     this.player = player;
     this.updateState({
-      currentFrame: player.getCurrentFrame(),
+      activeSceneId: activeSceneId(this.video, currentFrame),
+      currentFrame,
       isReady: true,
-      status: player.isPlaying() ? "playing" : this.dataStore.status,
+      lastError: null,
+      status: player.isPlaying() ? "playing" : "paused",
     });
   }
 
-  detachPlayer(player: AttachablePlayer): void {
-    if (this.player === player) {
-      this.player = null;
-      this.updateState({ isReady: false });
+  /** @internal Used by the Stagecut React adapter. */
+  detachPlayer(player: StagecutPlaybackAdapter): void {
+    if (this.player !== player) {
+      return;
     }
+    this.player = null;
+    this.updateState({ isReady: false, status: "idle" });
   }
 
   getCurrentFrame(): number {
-    return this.player?.getCurrentFrame() ?? this.dataStore.currentFrame;
+    return this.state.currentFrame;
   }
 
   getPlaybackState(): StagecutPlayerPlaybackState {
     return {
-      durationInFrames: this.dataStore.durationInFrames,
-      isReady: this.dataStore.isReady,
-      lastError: this.dataStore.lastError,
-      status: this.dataStore.status,
+      durationInFrames: this.state.durationInFrames,
+      isReady: this.state.isReady,
+      lastError: this.state.lastError,
+      status: this.state.status,
     };
   }
 
   getState(): StagecutPlayerState {
-    return { ...this.dataStore };
+    return { ...this.state };
   }
 
+  /** @internal Used by the Stagecut React adapter. */
   markBuffering(): void {
     this.updateState({ status: "buffering" });
   }
 
+  /** @internal Used by the Stagecut React adapter. */
   markEnded(): void {
-    this.updateState({ status: "ended" });
+    const currentFrame = this.video.timeline.durationInFrames - 1;
+    this.updateState({
+      activeSceneId: activeSceneId(this.video, currentFrame),
+      currentFrame,
+      status: "ended",
+    });
   }
 
+  /** @internal Used by the Stagecut React adapter. */
   markError(error: Error): void {
-    console.error("[stagecut-player]", JSON.stringify({ error: error.message, videoId: this.video.id }));
-    this.updateState({
-      lastError: error.message,
-      status: "error",
-    });
+    this.updateState({ lastError: error.message, status: "error" });
   }
 
+  /** @internal Used by the Stagecut React adapter. */
   markPaused(): void {
-    this.updateState({ status: "paused" });
+    if (this.state.status !== "ended") {
+      this.updateState({ status: "paused" });
+    }
   }
 
+  /** @internal Used by the Stagecut React adapter. */
   markPlaying(): void {
-    this.updateState({
-      lastError: null,
-      status: "playing",
-    });
+    this.updateState({ lastError: null, status: "playing" });
   }
 
+  /** @internal Used by the Stagecut React adapter. */
   markResumed(): void {
     this.updateState({
       lastError: null,
@@ -101,72 +119,112 @@ export class StagecutPlayerService {
     this.player?.pause();
   }
 
-  play(event?: SyntheticEvent): void {
-    if (this.dataStore.status === "ended" || this.dataStore.currentFrame >= this.video.durationInFrames - 1) {
+  play(): void {
+    if (this.state.status === "ended" || this.state.currentFrame >= this.video.timeline.durationInFrames - 1) {
       this.seekToFrame(0);
     }
-
-    this.player?.play(event);
+    this.player?.play();
   }
 
   seekToFrame(frame: number): void {
-    if (!Number.isInteger(frame) || frame < 0 || frame >= this.video.durationInFrames) {
-      throw new Error(`StagecutPlayerService seekToFrame received an invalid frame: ${frame}.`);
-    }
-
+    this.assertSeekFrame(frame);
     this.player?.seekTo(frame);
-    this.setCurrentFrame(frame);
+    this.updateState({
+      activeSceneId: activeSceneId(this.video, frame),
+      currentFrame: frame,
+      ...(this.state.status === "ended" || this.state.status === "error"
+        ? { lastError: null, status: "paused" as const }
+        : {}),
+    });
   }
 
+  seekToSeconds(seconds: number): void {
+    if (!Number.isFinite(seconds) || seconds < 0) {
+      throw new RangeError(`Stagecut seek time must be a non-negative finite number. Received ${seconds}.`);
+    }
+    this.seekToFrame(Math.min(Math.floor(seconds * this.video.fps), this.video.timeline.durationInFrames - 1));
+  }
+
+  /** @internal Used by the Stagecut React adapter. */
   setCurrentFrame(frame: number): void {
-    const currentFrame = Math.max(0, Math.min(frame, this.video.durationInFrames - 1));
+    const currentFrame = this.validateObservedFrame(frame);
     this.updateState({
-      activeFrameId: this.video.getActiveFrameId(currentFrame),
+      activeSceneId: activeSceneId(this.video, currentFrame),
       currentFrame,
+      ...(this.state.status === "ended" && currentFrame < this.video.timeline.durationInFrames - 1
+        ? { status: "paused" as const }
+        : {}),
     });
+  }
+
+  stepByFrames(frameDelta: number): void {
+    if (!Number.isInteger(frameDelta)) {
+      throw new RangeError(`Stagecut frame delta must be an integer. Received ${frameDelta}.`);
+    }
+    const target = Math.max(
+      0,
+      Math.min(this.state.currentFrame + frameDelta, this.video.timeline.durationInFrames - 1),
+    );
+    this.seekToFrame(target);
   }
 
   subscribe(listener: StagecutPlayerStateListener): () => void {
     this.listeners.add(listener);
-
-    return () => {
-      this.listeners.delete(listener);
-    };
+    return () => this.listeners.delete(listener);
   }
 
   subscribePlayback(listener: StagecutPlayerStateListener): () => void {
     this.playbackListeners.add(listener);
-
-    return () => {
-      this.playbackListeners.delete(listener);
-    };
+    return () => this.playbackListeners.delete(listener);
   }
 
-  toggle(event?: SyntheticEvent): void {
-    this.player?.toggle(event);
+  toggle(): void {
+    if (this.player?.isPlaying()) {
+      this.pause();
+    } else {
+      this.play();
+    }
+  }
+
+  private assertSeekFrame(frame: number): void {
+    if (!Number.isInteger(frame) || frame < 0 || frame >= this.video.timeline.durationInFrames) {
+      throw new RangeError(
+        `Stagecut seek frame must be an integer from 0 to ${this.video.timeline.durationInFrames - 1}. Received ${frame}.`,
+      );
+    }
   }
 
   private updateState(nextState: Partial<StagecutPlayerState>): void {
-    const shouldNotifyPlayback =
-      (nextState.durationInFrames !== undefined && nextState.durationInFrames !== this.dataStore.durationInFrames) ||
-      (nextState.isReady !== undefined && nextState.isReady !== this.dataStore.isReady) ||
-      (nextState.lastError !== undefined && nextState.lastError !== this.dataStore.lastError) ||
-      (nextState.status !== undefined && nextState.status !== this.dataStore.status);
-
-    Object.assign(this.dataStore, nextState);
+    const changedKeys = (Object.keys(nextState) as Array<keyof StagecutPlayerState>).filter(
+      (key) => nextState[key] !== this.state[key],
+    );
+    if (changedKeys.length === 0) {
+      return;
+    }
+    const playbackChanged = changedKeys.some((key) =>
+      ["durationInFrames", "isReady", "lastError", "status"].includes(key),
+    );
+    Object.assign(this.state, nextState);
     for (const listener of this.listeners) {
       listener();
     }
-    if (!shouldNotifyPlayback) {
-      return;
+    if (playbackChanged) {
+      for (const listener of this.playbackListeners) {
+        listener();
+      }
     }
+  }
 
-    for (const listener of this.playbackListeners) {
-      listener();
+  private validateObservedFrame(frame: number): number {
+    if (!Number.isInteger(frame) || frame < 0 || frame >= this.video.timeline.durationInFrames) {
+      throw new RangeError(
+        `Stagecut observed an invalid player frame for video "${this.video.id}": ${JSON.stringify({ frame })}`,
+      );
     }
+    return frame;
   }
 }
 
-export function createStagecutPlayerController(video: PlayerVideo): StagecutPlayerService {
+export function createStagecutPlayerController(video: CompiledStagecutVideo): StagecutPlayerService {
   return new StagecutPlayerService(video);
 }

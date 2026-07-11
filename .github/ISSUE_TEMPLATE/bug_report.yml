@@ -1,0 +1,25 @@
+name: Bug report
+description: Report a reproducible Stagecut problem
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include a minimal project definition and Surface registry when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Stagecut, React, Remotion, browser, and Node versions.
+    validations:
+      required: true

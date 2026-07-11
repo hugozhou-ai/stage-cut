@@ -1,5 +1,4 @@
 import type { TransitionConfig, TransitionName } from "./types";
-import { validateNonNegativeInteger } from "./validation";
 
 const DEFAULT_TRANSITION_DURATION_IN_FRAMES = 15;
 const transitionNames = new Set<TransitionName>([
@@ -31,7 +30,11 @@ export function normalizeTransition(transition: TransitionConfig | undefined): R
   }
 
   const durationInFrames = resolveTransitionDuration(transition);
-  validateNonNegativeInteger("Stagecut transition durationInFrames", durationInFrames);
+  if (!Number.isSafeInteger(durationInFrames) || durationInFrames < 0) {
+    throw new Error(
+      `Stagecut transition durationInFrames must be a non-negative safe integer. Received ${durationInFrames}.`,
+    );
+  }
 
   return {
     durationInFrames,
@@ -44,5 +47,5 @@ export function progressForRange(offset: number, durationInFrames: number): numb
     return 1;
   }
 
-  return Math.min(1, Math.max(0, offset / durationInFrames));
+  return Math.min(1, Math.max(0, offset / (durationInFrames - 1)));
 }

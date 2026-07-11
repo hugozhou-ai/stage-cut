@@ -1,19 +1,57 @@
 {
   "name": "@stagecut/react",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.5.0-beta.2",
+  "description": "React and Remotion-powered Web DOM animation player for Stagecut.",
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hugozhou-ai/stage-cut.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/hugozhou-ai/stage-cut/issues"
+  },
+  "homepage": "https://github.com/hugozhou-ai/stage-cut#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
-    "test": "pnpm exec vitest run --environment jsdom",
+    "build": "vite build && node ../../scripts/create-cjs-types.mjs dist/types",
+    "prepack": "pnpm run build",
+    "test": "pnpm exec vitest run src/react.test.tsx --environment jsdom",
+    "test:coverage": "pnpm exec vitest run src/react.test.tsx --environment jsdom --coverage --coverage.thresholds.lines=90 --coverage.thresholds.functions=90 --coverage.thresholds.statements=90 --coverage.thresholds.branches=90",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@remotion/player": "^4.0.477",
-    "@stagecut/core": "workspace:*",
-    "remotion": "^4.0.477"
+    "@remotion/player": "4.0.482",
+    "@stagecut/core": "workspace:^",
+    "remotion": "4.0.482"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.1",
@@ -21,10 +59,11 @@
     "@types/react-dom": "^19.2.3",
     "jsdom": "^27.3.0",
     "typescript": "^5.9.3",
+    "vite": "^8.0.9",
     "vitest": "^4.1.5"
   },
   "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
   }
 }
