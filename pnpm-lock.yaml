@@ -47,13 +47,13 @@ importers:
       '@fontsource-variable/lexend':
         specifier: 5.2.11
         version: 5.2.11
-      '@stagecut/core':
+      '@stage-cut/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@stagecut/devtools':
+      '@stage-cut/devtools':
         specifier: workspace:*
         version: link:../../packages/devtools
-      '@stagecut/react-player':
+      '@stage-cut/react-player':
         specifier: workspace:*
         version: link:../../packages/react
       lucide-react:
@@ -105,10 +105,10 @@ importers:
 
   packages/devtools:
     dependencies:
-      '@stagecut/core':
+      '@stage-cut/core':
         specifier: workspace:^
         version: link:../core
-      '@stagecut/react-player':
+      '@stage-cut/react-player':
         specifier: workspace:^
         version: link:../react
       react:
@@ -148,7 +148,7 @@ importers:
       '@remotion/player':
         specifier: 4.0.482
         version: 4.0.482(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@stagecut/core':
+      '@stage-cut/core':
         specifier: workspace:^
         version: link:../core
       react:

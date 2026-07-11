@@ -5,8 +5,8 @@
   "bumpVersionsWithWorkspaceProtocolOnly": true,
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [["@stagecut/core", "@stagecut/react-player"]],
-  "ignore": ["@stagecut/gallery"],
+  "fixed": [["@stage-cut/core", "@stage-cut/react-player"]],
+  "ignore": ["@stage-cut/gallery"],
   "linked": [],
   "privatePackages": { "version": false, "tag": false },
   "updateInternalDependencies": "patch"

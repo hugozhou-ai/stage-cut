@@ -3,9 +3,9 @@ import { gzipSync } from "node:zlib";
 
 const LOG_PREFIX = "[stagecut:size-check]";
 const budgets = [
-  { budget: 10 * 1024, packageName: "@stagecut/core", path: "packages/core/dist/index.js" },
-  { budget: 20 * 1024, packageName: "@stagecut/react-player", path: "packages/react/dist/index.js" },
-  { budget: 35 * 1024, packageName: "@stagecut/devtools", path: "packages/devtools/dist/index.js" },
+  { budget: 10 * 1024, packageName: "@stage-cut/core", path: "packages/core/dist/index.js" },
+  { budget: 20 * 1024, packageName: "@stage-cut/react-player", path: "packages/react/dist/index.js" },
+  { budget: 35 * 1024, packageName: "@stage-cut/devtools", path: "packages/devtools/dist/index.js" },
 ];
 
 let failed = false;

@@ -1,4 +1,4 @@
-import { compileStagecutVideo, defineStagecutProject, type TransitionName } from "@stagecut/core";
+import { compileStagecutVideo, defineStagecutProject, type TransitionName } from "@stage-cut/core";
 import { act, render, renderHook, screen } from "@testing-library/react";
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";

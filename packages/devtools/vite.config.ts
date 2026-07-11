@@ -19,7 +19,7 @@ export default defineConfig({
     },
     minify: true,
     rollupOptions: {
-      external: ["@stagecut/core", "@stagecut/react-player", "react", "react/jsx-runtime", "react-dom"],
+      external: ["@stage-cut/core", "@stage-cut/react-player", "react", "react/jsx-runtime", "react-dom"],
       output: { banner: '"use client";' },
     },
     sourcemap: true,

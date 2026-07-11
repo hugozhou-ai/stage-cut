@@ -1,4 +1,4 @@
-import type { TransitionConfig } from "@stagecut/core";
+import type { TransitionConfig } from "@stage-cut/core";
 import type { CSSProperties } from "react";
 import type { TransitionStyleContext } from "./types";
 
