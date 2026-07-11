@@ -130,7 +130,7 @@ export function StagecutPlayer({
       acknowledgeRemotionLicense={acknowledgeRemotionLicense}
       aria-label={ariaLabel}
       autoPlay={video.playback.autoPlay}
-      className={className}
+      {...(className === undefined ? {} : { className })}
       component={StagecutComposition}
       compositionHeight={video.stage.height}
       compositionWidth={video.stage.width}

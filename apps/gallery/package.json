@@ -7,20 +7,24 @@
     "build": "tsc -b && vite build",
     "dev": "node ../../scripts/dev-gallery.mjs",
     "preview": "vite preview",
+    "render": "node scripts/render.mjs",
     "type-check": "tsc -b"
   },
   "dependencies": {
+    "@fontsource-variable/lexend": "5.2.11",
     "@stagecut/core": "workspace:*",
     "@stagecut/react": "workspace:*",
-    "@fontsource-variable/lexend": "5.2.11",
     "lucide-react": "1.17.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "@remotion/bundler": "4.0.482",
+    "@remotion/renderer": "4.0.482",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "remotion": "4.0.482",
     "typescript": "^5.9.3",
     "vite": "^8.0.9"
   }
