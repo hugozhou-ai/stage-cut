@@ -1,19 +1,21 @@
 <p align="center">
   <a href="https://hugozhou-ai.github.io/stage-cut/">
-    <img alt="Stagecut logo — open the live production gallery" src="apps/gallery/src/assets/stage-cut.png" width="160" />
+    <img alt="StageCut logo — open the live production gallery" src="apps/gallery/src/assets/stage-cut.png" width="160" />
   </a>
 </p>
 
-# Stagecut
+# StageCut
 
-Stagecut is a high-performance React runtime for playing deterministic DOM animations in web pages. Projects are portable JSON; React surface components provide the visuals; a compiled scene timeline keeps playback work bounded.
+[![中文文档](https://img.shields.io/badge/中文-文档-blue)](README.zh-CN.md)
 
-Stagecut is designed for browser playback. It does not export MP4/WebM, manage audio, or provide a visual editor.
+StageCut is a deterministic animation engine for building and playing interactive DOM video experiences with React. Projects are defined as portable JSON; React Surface components handle rendering; a compiled scene timeline ensures bounded, predictable playback performance.
+
+StageCut is designed for browser playback only. It does not provide MP4/WebM export, audio management, or a visual editor.
 
 <p align="center">
   <strong><a href="https://hugozhou-ai.github.io/stage-cut/">▶ Open the Live Production Gallery</a></strong>
   <br />
-  <sub>Try interactive, production-style DOM animations built with Stagecut's public API.</sub>
+  <sub>Try interactive, production-style DOM animations built with StageCut's public API.</sub>
 </p>
 
 ## Features
@@ -24,7 +26,7 @@ Stagecut is designed for browser playback. It does not export MP4/WebM, manage a
 - Runtime validation with structured field paths
 - O(log n) active-scene lookup and a two-scene render window
 - React 18/19 and SSR-safe player mounting
-- Remotion-powered playback behind a Stagecut-owned controller API
+- Remotion-powered playback behind a StageCut-owned controller API
 
 ## Install
 
@@ -54,7 +56,7 @@ const project = defineStagecutProject({
     scenes: [{
       id: "intro",
       durationInFrames: 120,
-      layers: [{ id: "title", surfaceId: "title", inputProps: { text: "Hello Stagecut" } }],
+      layers: [{ id: "title", surfaceId: "title", inputProps: { text: "Hello StageCut" } }],
     }],
   }],
 });
@@ -82,7 +84,7 @@ Use `parseStagecutProject(unknown)` for external data. Validation failures throw
 
 > **[Open the Live Production Gallery →](https://hugozhou-ai.github.io/stage-cut/)**
 >
-> Explore interactive, production-style cases before installing or running Stagecut locally.
+> Explore interactive, production-style cases before installing or running StageCut locally.
 
 To run the same Gallery locally:
 
@@ -92,7 +94,7 @@ pnpm install
 pnpm dev
 ```
 
-Open the URL printed by Vite. The gallery contains three production-style cases built with Stagecut's public API.
+Open the URL printed by Vite. The gallery contains three production-style cases built with StageCut's public API.
 
 ### Application Creation Dialog
 
@@ -102,7 +104,7 @@ Click the animation to open its full-resolution MP4. Regenerate the gallery medi
 
 The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
 
-## Stagecut Devtools
+## StageCut Devtools
 
 Install the development-only Studio next to the runtime packages:
 
@@ -146,4 +148,4 @@ Maintainers should follow [RELEASING.md](RELEASING.md); publishing is manually a
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Report vulnerabilities through the process in [SECURITY.md](SECURITY.md).
 
-Stagecut is available under the [MIT License](LICENSE).
+StageCut is available under the [MIT License](LICENSE).
