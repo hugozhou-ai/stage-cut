@@ -4,7 +4,7 @@ import { Composition, registerRoot } from "remotion";
 import { type GalleryPageId, gallerySurfaces, galleryVideos } from "./src/galleryProject";
 import "./src/styles.css";
 
-const videoIds = ["task-flow", "message-cluster", "application-dialog"] as const satisfies readonly GalleryPageId[];
+const videoIds = ["application-dialog"] as const satisfies readonly GalleryPageId[];
 
 function GalleryComposition({ videoId }: { videoId: GalleryPageId }) {
   return <StagecutComposition surfaces={gallerySurfaces} video={galleryVideos[videoId]} />;

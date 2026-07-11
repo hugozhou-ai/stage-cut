@@ -1,0 +1,69 @@
+{
+  "name": "@stagecut/devtools",
+  "version": "0.5.0-beta.2",
+  "description": "In-page preview and debugging studio for Stagecut projects.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hugozhou-ai/stage-cut.git",
+    "directory": "packages/devtools"
+  },
+  "bugs": {
+    "url": "https://github.com/hugozhou-ai/stage-cut/issues"
+  },
+  "homepage": "https://github.com/hugozhou-ai/stage-cut#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "vite build && node ../../scripts/create-cjs-types.mjs dist/types",
+    "prepack": "pnpm run build",
+    "test": "pnpm exec vitest run src/devtools.test.tsx --environment jsdom",
+    "test:coverage": "pnpm exec vitest run src/devtools.test.tsx --environment jsdom --coverage --coverage.thresholds.lines=85 --coverage.thresholds.functions=80 --coverage.thresholds.statements=80 --coverage.thresholds.branches=65",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@stagecut/core": "workspace:^",
+    "@stagecut/react": "workspace:^"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^27.3.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.9",
+    "vite-plugin-dts": "5.0.3",
+    "vitest": "^4.1.5"
+  },
+  "peerDependencies": {
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
+  }
+}

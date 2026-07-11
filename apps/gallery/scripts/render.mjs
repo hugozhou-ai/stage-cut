@@ -7,7 +7,7 @@ import { renderMedia, selectComposition } from "@remotion/renderer";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const outputDirectory = path.join(repositoryRoot, "docs", "assets", "gallery");
-const videoIds = ["task-flow", "message-cluster", "application-dialog"];
+const videoIds = ["application-dialog"];
 
 mkdirSync(outputDirectory, { recursive: true });
 
@@ -23,10 +23,9 @@ for (const videoId of videoIds) {
   await renderMedia({
     codec: "h264",
     composition,
-    crf: 24,
-    imageFormat: "jpeg",
+    crf: 18,
+    imageFormat: "png",
     outputLocation: mp4Path,
-    scale: 2 / 3,
     serveUrl,
   });
 
@@ -40,7 +39,7 @@ for (const videoId of videoIds) {
       "-i",
       mp4Path,
       "-filter_complex",
-      "fps=12,scale=720:-1:flags=lanczos,split[frames][palette_source];[palette_source]palettegen=max_colors=96:stats_mode=diff[palette];[frames][palette]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle",
+      "fps=15,scale=1080:-1:flags=lanczos,split[frames][palette_source];[palette_source]palettegen=max_colors=192:stats_mode=full[palette];[frames][palette]paletteuse=dither=sierra2_4a:diff_mode=rectangle",
       "-loop",
       "0",
       gifPath,
