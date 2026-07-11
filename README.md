@@ -82,19 +82,11 @@ pnpm dev
 
 Open the URL printed by Vite. The gallery contains three production-style cases built with Stagecut's public API.
 
-### Cross-functional Task Flow
-
-[![Cross-functional Task Flow animation](docs/assets/gallery/task-flow.gif)](docs/assets/gallery/task-flow.mp4)
-
-### Project Activity Cluster
-
-[![Project Activity Cluster animation](docs/assets/gallery/message-cluster.gif)](docs/assets/gallery/message-cluster.mp4)
-
 ### Application Creation Dialog
 
 [![Application Creation Dialog animation](docs/assets/gallery/application-dialog.gif)](docs/assets/gallery/application-dialog.mp4)
 
-Click an animation to open its MP4. Regenerate all gallery media with `pnpm gallery:render`; the command requires FFmpeg on `PATH`.
+Click the animation to open its full-resolution MP4. Regenerate the gallery media with `pnpm gallery:render`; the command requires FFmpeg on `PATH`.
 
 The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
 
