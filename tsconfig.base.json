@@ -15,9 +15,9 @@
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@stagecut/core": ["packages/core/src/index.ts"],
-      "@stagecut/devtools": ["packages/devtools/src/index.ts"],
-      "@stagecut/react-player": ["packages/react/src/index.ts"]
+      "@stage-cut/core": ["packages/core/src/index.ts"],
+      "@stage-cut/devtools": ["packages/devtools/src/index.ts"],
+      "@stage-cut/react-player": ["packages/react/src/index.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

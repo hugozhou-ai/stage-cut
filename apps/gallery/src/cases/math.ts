@@ -1,4 +1,4 @@
-import type { JsonObject } from "@stagecut/core";
+import type { JsonObject } from "@stage-cut/core";
 
 export function clamp(value: number): number {
   return Math.min(1, Math.max(0, value));

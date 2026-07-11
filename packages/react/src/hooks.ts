@@ -1,4 +1,4 @@
-import type { CompiledStagecutVideo } from "@stagecut/core";
+import type { CompiledStagecutVideo } from "@stage-cut/core";
 import { useMemo, useSyncExternalStore } from "react";
 import { createStagecutPlayerController, type StagecutPlayerService } from "./StagecutPlayerService";
 import type { StagecutPlayerPlaybackState, StagecutPlayerState } from "./types";

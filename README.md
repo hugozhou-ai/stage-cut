@@ -31,16 +31,16 @@ StageCut is designed for browser playback only. It does not provide MP4/WebM exp
 ## Install
 
 ```bash
-pnpm add @stagecut/core @stagecut/react-player react react-dom
+pnpm add @stage-cut/core @stage-cut/react-player react react-dom
 ```
 
-`@stagecut/react-player` uses Remotion internally. Review [Remotion licensing](docs/remotion-license.md) and explicitly acknowledge it on the player when appropriate.
+`@stage-cut/react-player` uses Remotion internally. Review [Remotion licensing](docs/remotion-license.md) and explicitly acknowledge it on the player when appropriate.
 
 ## Quick start
 
 ```tsx
-import { compileStagecutVideo, defineStagecutProject } from "@stagecut/core";
-import { defineSurfaceRegistry, StagecutPlayer } from "@stagecut/react-player";
+import { compileStagecutVideo, defineStagecutProject } from "@stage-cut/core";
+import { defineSurfaceRegistry, StagecutPlayer } from "@stage-cut/react-player";
 
 const project = defineStagecutProject({
   schemaVersion: 1,
@@ -109,14 +109,14 @@ The server starts at port `5173` and advances when the port is busy. Override it
 Install the development-only Studio next to the runtime packages:
 
 ```bash
-pnpm add -D @stagecut/devtools
+pnpm add -D @stage-cut/devtools
 ```
 
 Mount it once near the root of the application. Keep `enabled` tied to the host's development environment so the
 Studio cannot be activated in production:
 
 ```tsx
-import { StagecutDevtools } from "@stagecut/devtools";
+import { StagecutDevtools } from "@stage-cut/devtools";
 
 <StagecutDevtools
   acknowledgeRemotionLicense

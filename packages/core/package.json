@@ -1,5 +1,5 @@
 {
-  "name": "@stagecut/core",
+  "name": "@stage-cut/core",
   "version": "0.5.0-beta.2",
   "description": "Serializable project model and compiled timeline for Stagecut DOM animations.",
   "type": "module",

@@ -19,7 +19,7 @@ export default defineConfig({
     },
     minify: true,
     rollupOptions: {
-      external: ["@remotion/player", "@stagecut/core", "react", "react/jsx-runtime", "remotion"],
+      external: ["@remotion/player", "@stage-cut/core", "react", "react/jsx-runtime", "remotion"],
       output: { banner: '"use client";' },
     },
     sourcemap: true,

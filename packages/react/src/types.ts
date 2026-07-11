@@ -1,4 +1,4 @@
-import type { JsonObject, StagecutProjectDefinition } from "@stagecut/core";
+import type { JsonObject, StagecutProjectDefinition } from "@stage-cut/core";
 import type { ComponentType } from "react";
 
 export interface FrameRenderContext {

@@ -1,5 +1,5 @@
-import type { StagecutProjectDefinition } from "@stagecut/core";
-import type { SurfaceComponentMap } from "@stagecut/react-player";
+import type { StagecutProjectDefinition } from "@stage-cut/core";
+import type { SurfaceComponentMap } from "@stage-cut/react-player";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Studio } from "./Studio";

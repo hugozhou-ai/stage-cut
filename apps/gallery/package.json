@@ -1,5 +1,5 @@
 {
-  "name": "@stagecut/gallery",
+  "name": "@stage-cut/gallery",
   "version": "0.5.0-beta.2",
   "private": true,
   "type": "module",
@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@fontsource-variable/lexend": "5.2.11",
-    "@stagecut/core": "workspace:*",
-    "@stagecut/devtools": "workspace:*",
-    "@stagecut/react-player": "workspace:*",
+    "@stage-cut/core": "workspace:*",
+    "@stage-cut/devtools": "workspace:*",
+    "@stage-cut/react-player": "workspace:*",
     "lucide-react": "1.17.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"

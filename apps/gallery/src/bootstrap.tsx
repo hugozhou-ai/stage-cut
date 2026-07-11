@@ -6,7 +6,7 @@ import { App } from "./main";
 
 const StagecutDevtools = import.meta.env.DEV
   ? lazy(async () => {
-      const module = await import("@stagecut/devtools");
+      const module = await import("@stage-cut/devtools");
       return { default: module.StagecutDevtools };
     })
   : null;
