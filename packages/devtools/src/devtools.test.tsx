@@ -26,7 +26,7 @@ const controller = {
   stepByFrames: vi.fn(),
 };
 
-vi.mock("@stagecut/react", () => ({
+vi.mock("@stagecut/react-player", () => ({
   StagecutPlayer: ({ video }: { video: { id: string } }) => <div data-testid="player">{video.id}</div>,
   useStagecutPlayerController: () => controller,
   useStagecutPlayerState: () => ({

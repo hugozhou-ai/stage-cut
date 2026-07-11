@@ -1,5 +1,5 @@
 import { compileStagecutVideo, defineStagecutProject } from "@stagecut/core";
-import { defineSurfaceRegistry } from "@stagecut/react";
+import { defineSurfaceRegistry } from "@stagecut/react-player";
 import { ApplicationDialogSurface } from "./cases/applicationDialog";
 import { MessageClusterSurface } from "./cases/messageCluster";
 import { TaskFlowSurface } from "./cases/taskFlow";

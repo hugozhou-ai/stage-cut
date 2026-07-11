@@ -14,7 +14,7 @@ import {
   type SurfaceComponentMap,
   useStagecutPlayerController,
   useStagecutPlayerState,
-} from "@stagecut/react";
+} from "@stagecut/react-player";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   cloneProject,

@@ -1,4 +1,4 @@
-import type { SurfaceComponentProps } from "@stagecut/react";
+import type { SurfaceComponentProps } from "@stagecut/react-player";
 import type { CSSProperties } from "react";
 import { GalleryIcon, type GalleryIconName } from "../icons";
 import { easeOutCubic, mix, number, text } from "./math";

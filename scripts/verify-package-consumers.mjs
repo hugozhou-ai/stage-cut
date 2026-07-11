@@ -16,10 +16,10 @@ async function packPackages() {
   await rm(artifacts, { force: true, recursive: true });
   await mkdir(artifacts, { recursive: true });
   run("pnpm", ["--filter", "@stagecut/core", "run", "build"], root);
-  run("pnpm", ["--filter", "@stagecut/react", "run", "build"], root);
+  run("pnpm", ["--filter", "@stagecut/react-player", "run", "build"], root);
   run("pnpm", ["--filter", "@stagecut/devtools", "run", "build"], root);
   run("pnpm", ["--filter", "@stagecut/core", "pack", "--pack-destination", artifacts], root);
-  run("pnpm", ["--filter", "@stagecut/react", "pack", "--pack-destination", artifacts], root);
+  run("pnpm", ["--filter", "@stagecut/react-player", "pack", "--pack-destination", artifacts], root);
   run("pnpm", ["--filter", "@stagecut/devtools", "pack", "--pack-destination", artifacts], root);
   const files = await readdir(artifacts);
   const core = files.find((file) => file.startsWith("stagecut-core-"));
@@ -33,7 +33,7 @@ async function packPackages() {
 
 const projectSource = `
 import { compileStagecutVideo, defineStagecutProject } from "@stagecut/core";
-import { defineSurfaceRegistry, StagecutPlayer } from "@stagecut/react";
+import { defineSurfaceRegistry, StagecutPlayer } from "@stagecut/react-player";
 import { StagecutDevtools } from "@stagecut/devtools";
 import React from "react";
 const project = defineStagecutProject({schemaVersion:1,id:"fixture",name:"Fixture",stages:[{id:"stage",name:"Stage",width:640,height:360}],surfaces:[{id:"title",name:"Title"}],videos:[{id:"video",name:"Video",stageId:"stage",fps:30,scenes:[{id:"scene",durationInFrames:30,layers:[{id:"title",surfaceId:"title",inputProps:{text:"Fixture"}}]}]}]});
@@ -53,7 +53,7 @@ async function verifyVite(tarballs, reactVersion) {
       dependencies: {
         "@stagecut/core": `file:${tarballs.core}`,
         "@stagecut/devtools": `file:${tarballs.devtools}`,
-        "@stagecut/react": `file:${tarballs.react}`,
+        "@stagecut/react-player": `file:${tarballs.react}`,
         react: reactVersion,
         "react-dom": reactVersion,
       },
@@ -62,7 +62,7 @@ async function verifyVite(tarballs, reactVersion) {
   );
   await writeFile(
     join(directory, "pnpm-workspace.yaml"),
-    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n  '@stagecut/react': 'file:${tarballs.react}'\n`,
+    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n  '@stagecut/react-player': 'file:${tarballs.react}'\n`,
   );
   await writeFile(join(directory, "index.html"), '<div id="root"></div><script type="module" src="/src.jsx"></script>');
   await writeFile(
@@ -90,7 +90,7 @@ async function verifyNext(tarballs) {
       dependencies: {
         "@stagecut/core": `file:${tarballs.core}`,
         "@stagecut/devtools": `file:${tarballs.devtools}`,
-        "@stagecut/react": `file:${tarballs.react}`,
+        "@stagecut/react-player": `file:${tarballs.react}`,
         next: "16.2.10",
         react: "19.2.4",
         "react-dom": "19.2.4",
@@ -99,7 +99,7 @@ async function verifyNext(tarballs) {
   );
   await writeFile(
     join(directory, "pnpm-workspace.yaml"),
-    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n  '@stagecut/react': 'file:${tarballs.react}'\n`,
+    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n  '@stagecut/react-player': 'file:${tarballs.react}'\n`,
   );
   await writeFile(
     join(directory, "app", "layout.jsx"),
