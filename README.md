@@ -18,6 +18,14 @@ StageCut is designed for browser playback only. It does not provide MP4/WebM exp
 
 Explore interactive, production-style cases before installing or running StageCut locally: **[Open the Live Production Gallery →](https://hugozhou-ai.github.io/stage-cut/)**
 
+The gallery contains three production-style cases built with StageCut's public API. These cases are reconstructed from real screens on [tutti.sh](https://tutti.sh/); see [tutti-os/tutti](https://github.com/tutti-os/tutti) for the source project.
+
+### Demo: Application Creation Dialog
+
+[![Application Creation Dialog animation](docs/assets/gallery/application-dialog.gif)](docs/assets/gallery/application-dialog.mp4)
+
+Click the animation to open its full-resolution MP4. Regenerate the gallery media with `pnpm gallery:render`; the command requires FFmpeg on `PATH`.
+
 To run the same Gallery locally:
 
 ```bash
@@ -26,15 +34,7 @@ pnpm install
 pnpm dev
 ```
 
-Open the URL printed by Vite. The gallery contains three production-style cases built with StageCut's public API. These cases are reconstructed from real screens on [tutti.sh](https://tutti.sh/); see [tutti-os/tutti](https://github.com/tutti-os/tutti) for the source project.
-
-### Application Creation Dialog
-
-[![Application Creation Dialog animation](docs/assets/gallery/application-dialog.gif)](docs/assets/gallery/application-dialog.mp4)
-
-Click the animation to open its full-resolution MP4. Regenerate the gallery media with `pnpm gallery:render`; the command requires FFmpeg on `PATH`.
-
-The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
+Open the URL printed by Vite. The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
 
 ## Features
 
