@@ -96,7 +96,7 @@ p {
   color: #737984;
   display: grid;
   gap: 11px;
-  grid-template-columns: 25px 1fr 16px;
+  grid-template-columns: 25px 1fr;
   padding: 13px 11px;
   text-decoration: none;
   transition: 0.2s ease;
@@ -132,19 +132,6 @@ p {
   color: #969ba5;
   font-size: 10px;
   line-height: 1.3;
-}
-.gallery-sidebar nav a > span {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  opacity: 0;
-  transform: translate(-4px, 4px);
-  transition: 0.2s ease;
-}
-.gallery-sidebar nav a.active > span {
-  color: var(--case-accent);
-  opacity: 1;
-  transform: none;
 }
 .sidebar-note {
   align-items: center;

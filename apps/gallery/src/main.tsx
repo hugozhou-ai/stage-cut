@@ -5,7 +5,13 @@ import { GalleryIcon } from "./icons";
 import "./styles.css";
 
 const cases: Array<{ accent: string; id: GalleryPageId; index: string; label: string; summary: string }> = [
-  { accent: "#6d7ff5", id: "task-flow", index: "01", label: "Task Flow", summary: "Cross-functional project planning" },
+  {
+    accent: "#6d7ff5",
+    id: "application-dialog",
+    index: "01",
+    label: "Application Dialog",
+    summary: "Layered desktop workflow",
+  },
   {
     accent: "#6d7ff5",
     id: "message-cluster",
@@ -13,20 +19,14 @@ const cases: Array<{ accent: string; id: GalleryPageId; index: string; label: st
     label: "Project Updates",
     summary: "Spatial activity choreography",
   },
-  {
-    accent: "#6d7ff5",
-    id: "application-dialog",
-    index: "03",
-    label: "Application Dialog",
-    summary: "Layered desktop workflow",
-  },
+  { accent: "#6d7ff5", id: "task-flow", index: "03", label: "Task Flow", summary: "Cross-functional project planning" },
 ];
 
 function pageFromHash(): GalleryPageId {
   const id = window.location.hash.replace(/^#\/?/, "") as GalleryPageId;
   if (id in galleryVideos) return id;
-  window.history.replaceState(null, "", "#/task-flow");
-  return "task-flow";
+  window.history.replaceState(null, "", "#/application-dialog");
+  return "application-dialog";
 }
 
 function useGalleryRoute(): GalleryPageId {
@@ -175,13 +175,13 @@ function PlayerControls({ pageId }: { pageId: GalleryPageId }) {
 
 export function App() {
   const routedPageId = useGalleryRoute();
-  const pageId = routedPageId in galleryVideos ? routedPageId : "task-flow";
+  const pageId = routedPageId in galleryVideos ? routedPageId : "application-dialog";
   const currentCase = cases.find((item) => item.id === pageId) ?? cases[0];
   const video = galleryVideos[pageId];
   return (
     <div className="gallery-shell">
       <aside className="gallery-sidebar">
-        <a className="gallery-brand" href="#/task-flow">
+        <a className="gallery-brand" href="#/application-dialog">
           <span>
             <GalleryIcon name="clapperboard" size={19} />
           </span>
@@ -204,9 +204,6 @@ export function App() {
                 <strong>{item.label}</strong>
                 <small>{item.summary}</small>
               </div>
-              <span>
-                <GalleryIcon name="arrow-up-right" size={14} />
-              </span>
             </a>
           ))}
         </nav>
