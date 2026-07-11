@@ -1,7 +1,10 @@
 import { StagecutPlayer, useStagecutPlayerController, useStagecutPlayerState } from "@stagecut/react";
-import { useEffect, useState } from "react";
+import { type ComponentProps, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import stagecutLogoUrl from "./assets/stage-cut.png";
-import { type GalleryPageId, gallerySurfaces, galleryVideos } from "./galleryProject";
+import { ApplicationDialogSurface } from "./cases/applicationDialog";
+import { MessageClusterSurface } from "./cases/messageCluster";
+import { TaskFlowSurface } from "./cases/taskFlow";
+import { type GalleryPageId, galleryVideos } from "./galleryProject";
 import { GalleryIcon } from "./icons";
 import "./styles.css";
 
@@ -22,6 +25,24 @@ const cases: Array<{ accent: string; id: GalleryPageId; index: string; label: st
   },
   { accent: "#6d7ff5", id: "task-flow", index: "03", label: "Task Flow", summary: "Cross-functional project planning" },
 ];
+
+const caseActions: Record<GalleryPageId, Array<{ label: string; sceneId: string; summary: string }>> = {
+  "application-dialog": [
+    { label: "Edit prompt", sceneId: "prompt-mention", summary: "Focus and select real text" },
+    { label: "Browse references", sceneId: "reference-palette", summary: "Click any DOM result" },
+    { label: "Generate", sceneId: "creation-result", summary: "Jump to deterministic output" },
+  ],
+  "message-cluster": [
+    { label: "Raw signals", sceneId: "cards-scatter", summary: "Inspect individual updates" },
+    { label: "Group updates", sceneId: "cards-group", summary: "Re-layout semantic cards" },
+    { label: "Open actions", sceneId: "actions-menu", summary: "Use the live action menu" },
+  ],
+  "task-flow": [
+    { label: "Reveal graph", sceneId: "branches-reveal", summary: "Scrub vector paths precisely" },
+    { label: "Dispatch brief", sceneId: "dispatch-3", summary: "Random-access one workstream" },
+    { label: "Inspect team", sceneId: "team-messages", summary: "Click a live agent node" },
+  ],
+};
 
 function pageFromHash(): GalleryPageId {
   const id = window.location.hash.replace(/^#\/?/, "") as GalleryPageId;
@@ -55,19 +76,112 @@ function PlayerControls({ pageId }: { pageId: GalleryPageId }) {
   const activeSceneIndex = video.getActiveSceneIndex(state.currentFrame);
   const activeScene = video.timeline.scenes[activeSceneIndex];
   const renderWindow = video.getRenderWindow(state.currentFrame);
+  const initializedRef = useRef(false);
+  const [selectedElement, setSelectedElement] = useState<string>();
+  const [lastAction, setLastAction] = useState("Choose a moment below, then interact directly with the scene.");
 
   const seekScene = (index: number) => {
     const scene = video.timeline.scenes[index];
     if (scene) controller.seekToFrame(scene.startFrame);
   };
 
+  const seekSceneById = useCallback(
+    (sceneId: string, position = 0.72) => {
+      const scene = video.timeline.scenes.find((item) => item.scene.id === sceneId);
+      if (!scene) return;
+      controller.pause();
+      controller.seekToFrame(
+        Math.min(scene.endFrame - 1, scene.startFrame + Math.floor(scene.scene.durationInFrames * position)),
+      );
+    },
+    [controller, video],
+  );
+
+  useEffect(() => {
+    if (!state.isReady || initializedRef.current) return;
+    initializedRef.current = true;
+    const initialScene = {
+      "application-dialog": "prompt-mention",
+      "message-cluster": "cards-group",
+      "task-flow": "team-messages",
+    }[pageId];
+    seekSceneById(initialScene, 0.82);
+  }, [pageId, seekSceneById, state.isReady]);
+
+  const handleSurfaceAction = useCallback(
+    (action: string, value?: string) => {
+      if (pageId === "application-dialog") {
+        if (action === "open-references") seekSceneById("reference-palette", 0.7);
+        if (action === "edit-prompt") {
+          setLastAction(`Edited live prompt: ${value?.slice(0, 48) || "empty"}`);
+          return;
+        }
+        if (action === "reference") {
+          setSelectedElement(value);
+          setLastAction(`Selected live reference: ${value ?? "unknown"}`);
+          if (value === "canvas") seekSceneById("select-visual-canvas", 0.72);
+          return;
+        }
+        if (action === "create") seekSceneById("creation-result", 0.58);
+      }
+      if (pageId === "message-cluster") {
+        if (action === "card") setSelectedElement(value);
+        if (action === "group") seekSceneById("cards-group", 0.82);
+        setLastAction(
+          action === "card" ? `Focused semantic card: ${value ?? "unknown"}` : `Ran live action: ${action}`,
+        );
+      }
+      if (pageId === "task-flow" && action === "agent") {
+        setSelectedElement(value);
+        setLastAction(`Focused live workstream: ${value ?? "unknown"}`);
+      }
+      if (action !== "reference" && action !== "card" && action !== "agent") {
+        setLastAction(`Ran live action: ${action}`);
+      }
+    },
+    [pageId, seekSceneById],
+  );
+
+  const interactiveSurfaces = useMemo(
+    () => ({
+      "application-dialog": (props: ComponentProps<typeof ApplicationDialogSurface>) => (
+        <ApplicationDialogSurface
+          {...props}
+          onAction={handleSurfaceAction}
+          {...(selectedElement === undefined ? {} : { selectedReference: selectedElement })}
+        />
+      ),
+      "message-cluster": (props: ComponentProps<typeof MessageClusterSurface>) => (
+        <MessageClusterSurface
+          {...props}
+          onAction={handleSurfaceAction}
+          {...(selectedElement === undefined ? {} : { selectedCard: selectedElement })}
+        />
+      ),
+      "task-flow": (props: ComponentProps<typeof TaskFlowSurface>) => (
+        <TaskFlowSurface
+          {...props}
+          onAction={handleSurfaceAction}
+          {...(selectedElement === undefined ? {} : { selectedAgent: selectedElement })}
+        />
+      ),
+    }),
+    [handleSurfaceAction, selectedElement],
+  );
+
   return (
     <>
       <section className="showcase-player">
         <div className="player-frame">
-          <StagecutPlayer acknowledgeRemotionLicense controller={controller} surfaces={gallerySurfaces} video={video} />
+          <StagecutPlayer
+            acknowledgeRemotionLicense
+            controller={controller}
+            interactive
+            surfaces={interactiveSurfaces}
+            video={video}
+          />
           <div className="player-corner-label">
-            <i /> LIVE DOM
+            <i /> INTERACTIVE DOM
           </div>
         </div>
         <div className="transport">
@@ -119,6 +233,31 @@ function PlayerControls({ pageId }: { pageId: GalleryPageId }) {
             <GalleryIcon name="restart" size={15} />
           </button>
         </div>
+        <div className="interaction-dock">
+          <div className="interaction-intro">
+            <span>TRY THE LIVE SURFACE</span>
+            <p aria-live="polite">{lastAction}</p>
+          </div>
+          <div className="interaction-actions">
+            {caseActions[pageId].map((action) => (
+              <button
+                key={action.sceneId}
+                onClick={() => {
+                  seekSceneById(action.sceneId);
+                  setLastAction(`${action.label}: ${action.summary}`);
+                }}
+                type="button"
+              >
+                <strong>{action.label}</strong>
+                <small>{action.summary}</small>
+              </button>
+            ))}
+          </div>
+          <div className="dom-proof">
+            <span>NOT A VIDEO</span>
+            <b>Tab · click · select text</b>
+          </div>
+        </div>
       </section>
       <section className="case-inspector">
         <div className="scene-map">
@@ -162,7 +301,7 @@ function PlayerControls({ pageId }: { pageId: GalleryPageId }) {
           </div>
           <div>
             <strong>{renderWindow.reduce((sum, item) => sum + item.scene.layers.length, 0)}</strong>
-            <span>DOM surfaces</span>
+            <span>live surfaces</span>
           </div>
           <footer>
             <i className={isPlaying ? "running" : ""} />

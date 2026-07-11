@@ -1,5 +1,5 @@
 import type { SurfaceComponentProps } from "@stagecut/react";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useState } from "react";
 import { GalleryIcon, type GalleryIconName } from "../icons";
 import { easeInOutCubic, easeOutCubic, mix, text } from "./math";
 
@@ -68,8 +68,18 @@ const rows: PaletteRow[] = [
 
 const prompt = "Create a polished launch visual for the spring campaign";
 
-function Palette({ phase, progress }: { phase: string; progress: number }) {
-  const selected = phase === "select" || phase === "complete";
+function Palette({
+  onAction,
+  phase,
+  progress,
+  selectedReference,
+}: {
+  onAction?: (action: string, value?: string) => void;
+  phase: string;
+  progress: number;
+  selectedReference?: string;
+}) {
+  const selected = phase === "select" || phase === "complete" || selectedReference === "canvas";
   const scrollProgress = phase === "palette" ? easeInOutCubic(progress) : selected ? 1 : 0;
   let previousGroup = "";
   return (
@@ -92,7 +102,12 @@ function Palette({ phase, progress }: { phase: string; progress: number }) {
             return (
               <div className="palette-row-wrap" key={row.id}>
                 {showGroup ? <h4>{row.group}</h4> : null}
-                <div className={`palette-row ${selected && row.id === "canvas" ? "selected" : ""}`}>
+                <button
+                  aria-pressed={selectedReference === row.id || (selected && row.id === "canvas")}
+                  className={`palette-row ${selectedReference === row.id || (selected && row.id === "canvas") ? "selected" : ""}`}
+                  onClick={() => onAction?.("reference", row.id)}
+                  type="button"
+                >
                   <i style={{ "--icon-tint": row.tint } as CSSProperties}>
                     <GalleryIcon name={row.icon} size={18} />
                   </i>
@@ -101,7 +116,7 @@ function Palette({ phase, progress }: { phase: string; progress: number }) {
                     {row.detail ? <small>{row.detail}</small> : null}
                   </div>
                   {row.id === "issue" ? <em>To run</em> : null}
-                </div>
+                </button>
               </div>
             );
           })}
@@ -178,7 +193,15 @@ function SuccessCanvas({ progress }: { progress: number }) {
   );
 }
 
-export function ApplicationDialogSurface({ context, input }: SurfaceComponentProps) {
+export function ApplicationDialogSurface({
+  context,
+  input,
+  onAction,
+  selectedReference,
+}: SurfaceComponentProps & {
+  onAction?: (action: string, value?: string) => void;
+  selectedReference?: string;
+}) {
   const phase = text(input, "phase", "enter");
   const progress = context.progress;
   const dialogEnter = phase === "enter" ? easeOutCubic(progress) : 1;
@@ -186,6 +209,7 @@ export function ApplicationDialogSurface({ context, input }: SurfaceComponentPro
   const paletteEnter = phase === "palette" ? easeOutCubic(Math.min(1, progress * 2)) : paletteVisible ? 1 : 0;
   const typed =
     phase === "enter" ? 0 : phase === "mention" ? Math.round(prompt.length * easeOutCubic(progress)) : prompt.length;
+  const [editedPrompt, setEditedPrompt] = useState<string>();
 
   return (
     <div className="case-surface application-dialog-surface">
@@ -215,22 +239,30 @@ export function ApplicationDialogSurface({ context, input }: SurfaceComponentPro
             }}
           >
             <div className="dialog-input">
-              <p>
-                {prompt.slice(0, typed)}
-                {phase === "mention" && typed < prompt.length ? <i className="typing-caret dark" /> : null}
-              </p>
+              <textarea
+                aria-label="Creation prompt"
+                className="dialog-prompt"
+                onChange={(event) => {
+                  setEditedPrompt(event.currentTarget.value);
+                  onAction?.("edit-prompt", event.currentTarget.value);
+                }}
+                readOnly={onAction === undefined}
+                rows={2}
+                spellCheck={false}
+                value={editedPrompt ?? prompt.slice(0, typed)}
+              />
               <div className="dialog-toolbar">
-                <button aria-label="Add reference" type="button">
+                <button aria-label="Add reference" onClick={() => onAction?.("open-references")} type="button">
                   <GalleryIcon name="plus" size={18} />
                 </button>
-                <button aria-label="Mention" type="button">
+                <button aria-label="Mention" onClick={() => onAction?.("open-references")} type="button">
                   <GalleryIcon name="at-sign" size={18} />
                 </button>
                 <span />
                 <button className="model" type="button">
                   Creative mode <GalleryIcon name="chevron-down" size={14} />
                 </button>
-                <button className="send" type="button">
+                <button aria-label="Create visual" className="send" onClick={() => onAction?.("create")} type="button">
                   <GalleryIcon name="arrow-up-right" size={18} />
                 </button>
               </div>
@@ -253,7 +285,12 @@ export function ApplicationDialogSurface({ context, input }: SurfaceComponentPro
                 transform: `translate(-50%, ${mix(-43, -50, paletteEnter)}%) scale(${mix(0.96, 1, paletteEnter)})`,
               }}
             >
-              <Palette phase={phase} progress={progress} />
+              <Palette
+                {...(onAction === undefined ? {} : { onAction })}
+                phase={phase}
+                progress={progress}
+                {...(selectedReference === undefined ? {} : { selectedReference })}
+              />
             </div>
           ) : null}
         </>

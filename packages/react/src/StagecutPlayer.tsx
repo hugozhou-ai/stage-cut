@@ -16,6 +16,7 @@ export interface StagecutPlayerProps {
   controller?: StagecutPlayerService;
   controllerRef?: Ref<StagecutPlayerService>;
   controls?: boolean;
+  interactive?: boolean;
   onError?: (error: Error) => void;
   style?: CSSProperties;
   surfaces: SurfaceComponentMap;
@@ -45,6 +46,7 @@ export function StagecutPlayer({
   controller: externalController,
   controllerRef,
   controls,
+  interactive = false,
   onError,
   style,
   surfaces,
@@ -138,7 +140,7 @@ export function StagecutPlayer({
       durationInFrames={video.timeline.durationInFrames}
       fps={video.fps}
       initiallyMuted
-      inputProps={{ surfaces, video }}
+      inputProps={{ interactive, surfaces, video }}
       loop={video.playback.loop}
       moveToBeginningWhenEnded={false}
       numberOfSharedAudioTags={0}

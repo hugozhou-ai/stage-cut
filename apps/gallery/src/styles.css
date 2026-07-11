@@ -254,7 +254,79 @@ p {
   left: 13px;
   padding: 5px 7px;
   position: absolute;
+  pointer-events: none;
   top: 13px;
+}
+.interaction-dock {
+  align-items: stretch;
+  background: #f8f9fb;
+  border-top: 1px solid rgba(60, 60, 60, 0.08);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(190px, 0.8fr) minmax(480px, 2fr) minmax(150px, 0.55fr);
+  padding: 14px 18px;
+}
+.interaction-intro,
+.dom-proof {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.interaction-intro > span,
+.dom-proof > span {
+  color: #6d7ff5;
+  font:
+    600 8px "Lexend Variable",
+    monospace;
+  letter-spacing: 0.12em;
+}
+.interaction-intro p {
+  color: #737984;
+  font-size: 9px;
+  line-height: 1.45;
+  margin-top: 5px;
+}
+.interaction-actions {
+  display: grid;
+  gap: 7px;
+  grid-template-columns: repeat(3, 1fr);
+}
+.interaction-actions button {
+  background: #fff;
+  border: 1px solid #e1e3e8;
+  border-radius: 7px;
+  cursor: pointer;
+  display: grid;
+  gap: 3px;
+  padding: 9px 10px;
+  text-align: left;
+  transition: 0.16s ease;
+}
+.interaction-actions button:hover,
+.interaction-actions button:focus-visible {
+  border-color: #aeb7f9;
+  box-shadow: 0 4px 12px rgba(71, 82, 158, 0.08);
+  outline: none;
+  transform: translateY(-1px);
+}
+.interaction-actions strong {
+  color: #343840;
+  font-size: 9px;
+}
+.interaction-actions small {
+  color: #969ba5;
+  font-size: 7px;
+  line-height: 1.35;
+}
+.dom-proof {
+  border-left: 1px solid #e2e4e9;
+  padding-left: 14px;
+}
+.dom-proof b {
+  color: #666c77;
+  font-size: 8px;
+  font-weight: 500;
+  margin-top: 5px;
 }
 .player-corner-label i {
   background: #6d7ff5;
@@ -606,6 +678,10 @@ p {
 }
 .task-agent {
   align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -615,6 +691,12 @@ p {
   transition: opacity 0.08s linear;
   width: 190px;
   z-index: 5;
+}
+.task-agent:disabled {
+  pointer-events: none;
+}
+.task-agent:focus-visible {
+  outline: none;
 }
 .task-agent-orbit {
   align-items: center;
@@ -630,6 +712,14 @@ p {
   margin-bottom: 6px;
   transform: rotate(45deg);
   width: 72px;
+}
+.task-agent:hover .task-agent-orbit,
+.task-agent:focus-visible .task-agent-orbit,
+.task-agent.selected .task-agent-orbit {
+  border-color: #7685f1;
+  box-shadow:
+    0 0 0 9px rgba(104, 112, 216, 0.12),
+    0 18px 34px rgba(42, 45, 53, 0.17);
 }
 .task-agent-orbit span {
   color: #6d7ff5;
@@ -727,13 +817,25 @@ p {
   border: 1px solid #dde0e6;
   border-radius: 8px;
   box-shadow: 0 18px 24px rgba(19, 27, 54, 0.1);
+  color: inherit;
+  cursor: pointer;
   display: flex;
   gap: 12px;
   min-height: 0;
   overflow: hidden;
   padding: 12px;
   position: absolute;
+  text-align: left;
+  transition: box-shadow 0.16s ease;
   transform-origin: center;
+}
+.message-card:hover,
+.message-card:focus-visible,
+.message-card.selected {
+  border-color: #8d99f0;
+  box-shadow: 0 22px 34px rgba(45, 55, 120, 0.18);
+  outline: none;
+  z-index: 20;
 }
 .message-card::after {
   background: var(--card-accent);
@@ -848,17 +950,26 @@ p {
   width: 205px;
   z-index: 30;
 }
-.cluster-menu span {
+.cluster-menu button {
   align-items: center;
+  background: transparent;
+  border: 0;
   border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
   display: flex;
   font-size: 9px;
   gap: 9px;
   padding: 9px;
+  text-align: left;
+  width: 100%;
 }
-.cluster-menu span:nth-child(2) {
+.cluster-menu button:nth-child(2),
+.cluster-menu button:hover,
+.cluster-menu button:focus-visible {
   background: #e8eafd;
   color: #5864ca;
+  outline: none;
 }
 .cluster-menu i {
   align-items: center;
@@ -972,12 +1083,20 @@ p {
   right: 3px;
   top: 3px;
 }
-.dialog-input p {
+.dialog-prompt {
+  background: transparent;
+  border: 0;
+  color: inherit;
   font-size: 16px;
+  font-weight: inherit;
   line-height: 1.45;
+  outline: none;
+  padding: 0;
+  resize: none;
+  width: 100%;
 }
-.typing-caret.dark {
-  background: #6571e8;
+.dialog-prompt:focus {
+  caret-color: #6571e8;
 }
 .dialog-toolbar {
   align-items: center;
@@ -990,11 +1109,17 @@ p {
   border: 0;
   border-radius: 50%;
   color: #727783;
+  cursor: pointer;
   display: flex;
   height: 34px;
   justify-content: center;
   padding: 0;
   width: 34px;
+}
+.dialog-toolbar button:hover,
+.dialog-toolbar button:focus-visible {
+  box-shadow: 0 0 0 3px rgba(109, 127, 245, 0.18);
+  outline: none;
 }
 .dialog-toolbar span {
   flex: 1;
@@ -1062,6 +1187,7 @@ p {
   border: 0;
   border-radius: 6px;
   color: #8a8f99;
+  cursor: pointer;
   font-size: 9px;
   padding: 7px 10px;
 }
@@ -1104,6 +1230,13 @@ p {
   gap: 11px;
   min-height: 51px;
   padding: 7px 10px;
+  text-align: left;
+  width: 100%;
+}
+.palette-row:hover,
+.palette-row:focus-visible {
+  background: #f3f4fb;
+  outline: none;
 }
 .palette-row.selected {
   background: #edf0ff;
