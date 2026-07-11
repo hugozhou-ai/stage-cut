@@ -17,23 +17,30 @@ async function packPackages() {
   await mkdir(artifacts, { recursive: true });
   run("pnpm", ["--filter", "@stagecut/core", "run", "build"], root);
   run("pnpm", ["--filter", "@stagecut/react", "run", "build"], root);
+  run("pnpm", ["--filter", "@stagecut/devtools", "run", "build"], root);
   run("pnpm", ["--filter", "@stagecut/core", "pack", "--pack-destination", artifacts], root);
   run("pnpm", ["--filter", "@stagecut/react", "pack", "--pack-destination", artifacts], root);
+  run("pnpm", ["--filter", "@stagecut/devtools", "pack", "--pack-destination", artifacts], root);
   const files = await readdir(artifacts);
   const core = files.find((file) => file.startsWith("stagecut-core-"));
   const react = files.find((file) => file.startsWith("stagecut-react-"));
-  if (!core || !react) throw new Error(`Stagecut package tarballs were not created: ${JSON.stringify({ files })}`);
-  return { core: join(artifacts, core), react: join(artifacts, react) };
+  const devtools = files.find((file) => file.startsWith("stagecut-devtools-"));
+  if (!core || !react || !devtools) {
+    throw new Error(`Stagecut package tarballs were not created: ${JSON.stringify({ files })}`);
+  }
+  return { core: join(artifacts, core), devtools: join(artifacts, devtools), react: join(artifacts, react) };
 }
 
 const projectSource = `
 import { compileStagecutVideo, defineStagecutProject } from "@stagecut/core";
 import { defineSurfaceRegistry, StagecutPlayer } from "@stagecut/react";
+import { StagecutDevtools } from "@stagecut/devtools";
 import React from "react";
 const project = defineStagecutProject({schemaVersion:1,id:"fixture",name:"Fixture",stages:[{id:"stage",name:"Stage",width:640,height:360}],surfaces:[{id:"title",name:"Title"}],videos:[{id:"video",name:"Video",stageId:"stage",fps:30,scenes:[{id:"scene",durationInFrames:30,layers:[{id:"title",surfaceId:"title",inputProps:{text:"Fixture"}}]}]}]});
 const surfaces = defineSurfaceRegistry(project,{title:({input})=>React.createElement("h1",null,input.text)});
 const video = compileStagecutVideo(project,"video");
 export const player = React.createElement(StagecutPlayer,{surfaces,video});
+export const devtools = React.createElement(StagecutDevtools,{enabled:false,project,surfaces});
 `;
 
 async function verifyVite(tarballs, reactVersion) {
@@ -45,6 +52,7 @@ async function verifyVite(tarballs, reactVersion) {
       type: "module",
       dependencies: {
         "@stagecut/core": `file:${tarballs.core}`,
+        "@stagecut/devtools": `file:${tarballs.devtools}`,
         "@stagecut/react": `file:${tarballs.react}`,
         react: reactVersion,
         "react-dom": reactVersion,
@@ -54,16 +62,16 @@ async function verifyVite(tarballs, reactVersion) {
   );
   await writeFile(
     join(directory, "pnpm-workspace.yaml"),
-    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n`,
+    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n  '@stagecut/react': 'file:${tarballs.react}'\n`,
   );
   await writeFile(join(directory, "index.html"), '<div id="root"></div><script type="module" src="/src.jsx"></script>');
   await writeFile(
     join(directory, "src.jsx"),
-    `${projectSource}\nimport {createRoot} from "react-dom/client";createRoot(document.getElementById("root")).render(player);`,
+    `${projectSource}\nimport {createRoot} from "react-dom/client";createRoot(document.getElementById("root")).render(React.createElement(React.Fragment,null,player,devtools));`,
   );
   await writeFile(
     join(directory, "ssr.mjs"),
-    `${projectSource}\nimport {renderToString} from "react-dom/server";const html=renderToString(player);if(!html.includes("data-stagecut-placeholder"))throw new Error("SSR placeholder missing");`,
+    `${projectSource}\nimport {renderToString} from "react-dom/server";const html=renderToString(React.createElement(React.Fragment,null,player,devtools));if(!html.includes("data-stagecut-placeholder"))throw new Error("SSR placeholder missing");if(html.includes("stagecut-devtools-root"))throw new Error("Disabled Devtools rendered during SSR");`,
   );
   run("pnpm", ["install", "--ignore-scripts"], directory);
   run("pnpm", ["exec", "vite", "build"], directory);
@@ -81,6 +89,7 @@ async function verifyNext(tarballs) {
       scripts: { build: "next build" },
       dependencies: {
         "@stagecut/core": `file:${tarballs.core}`,
+        "@stagecut/devtools": `file:${tarballs.devtools}`,
         "@stagecut/react": `file:${tarballs.react}`,
         next: "16.2.10",
         react: "19.2.4",
@@ -90,7 +99,7 @@ async function verifyNext(tarballs) {
   );
   await writeFile(
     join(directory, "pnpm-workspace.yaml"),
-    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n`,
+    `packages: ["."]\noverrides:\n  '@stagecut/core': 'file:${tarballs.core}'\n  '@stagecut/react': 'file:${tarballs.react}'\n`,
   );
   await writeFile(
     join(directory, "app", "layout.jsx"),
@@ -98,7 +107,7 @@ async function verifyNext(tarballs) {
   );
   await writeFile(
     join(directory, "app", "page.jsx"),
-    `"use client";\n${projectSource}\nexport default function Page(){return player}`,
+    `"use client";\n${projectSource}\nexport default function Page(){return React.createElement(React.Fragment,null,player,devtools)}`,
   );
   run("pnpm", ["install", "--ignore-scripts"], directory);
   run("pnpm", ["build"], directory);

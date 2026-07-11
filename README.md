@@ -90,6 +90,33 @@ Click the animation to open its full-resolution MP4. Regenerate the gallery medi
 
 The server starts at port `5173` and advances when the port is busy. Override it with `STAGECUT_GALLERY_PORT` and `STAGECUT_GALLERY_HOST`. The previous `STAGECUT_STUDIO_PORT` and `STAGECUT_STUDIO_HOST` names remain accepted during the Gallery rename.
 
+## Stagecut Devtools
+
+Install the development-only Studio next to the runtime packages:
+
+```bash
+pnpm add -D @stagecut/devtools
+```
+
+Mount it once near the root of the application. Keep `enabled` tied to the host's development environment so the
+Studio cannot be activated in production:
+
+```tsx
+import { StagecutDevtools } from "@stagecut/devtools";
+
+<StagecutDevtools
+  acknowledgeRemotionLicense
+  enabled={import.meta.env.DEV}
+  project={project}
+  surfaces={surfaces}
+/>;
+```
+
+Open the application with `?stagecut` to reveal the global launcher. It opens `?stagecut=studio` in a new tab where
+you can preview the real Surface components, edit scenes, transitions, layers, and input props, inspect runtime frame
+state, and copy the resulting changes as an Agent Prompt. Drafts live only in the current tab's `sessionStorage` and
+never modify source files directly.
+
 ## Verification
 
 ```bash
