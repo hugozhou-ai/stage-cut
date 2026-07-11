@@ -1,3 +1,7 @@
+<p align="center">
+  <img alt="Stagecut logo" src="apps/gallery/src/assets/stage-cut.png" width="160" />
+</p>
+
 # Stagecut
 
 Stagecut is a high-performance React runtime for playing deterministic DOM animations in web pages. Projects are portable JSON; React surface components provide the visuals; a compiled scene timeline keeps playback work bounded.

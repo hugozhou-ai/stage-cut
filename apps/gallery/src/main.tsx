@@ -1,5 +1,6 @@
 import { StagecutPlayer, useStagecutPlayerController, useStagecutPlayerState } from "@stagecut/react";
 import { useEffect, useState } from "react";
+import stagecutLogoUrl from "./assets/stage-cut.png";
 import { type GalleryPageId, gallerySurfaces, galleryVideos } from "./galleryProject";
 import { GalleryIcon } from "./icons";
 import "./styles.css";
@@ -183,7 +184,7 @@ export function App() {
       <aside className="gallery-sidebar">
         <a className="gallery-brand" href="#/application-dialog">
           <span>
-            <GalleryIcon name="clapperboard" size={19} />
+            <img alt="" src={stagecutLogoUrl} />
           </span>
           <div>
             <b>stagecut</b>

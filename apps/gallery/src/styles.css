@@ -51,16 +51,15 @@ p {
 }
 .gallery-brand > span {
   align-items: center;
-  background: #6d7ff5;
-  border-radius: 9px;
-  color: #fff;
   display: flex;
-  font:
-    700 12px "Lexend Variable",
-    sans-serif;
   height: 38px;
   justify-content: center;
-  letter-spacing: -0.04em;
+  width: 38px;
+}
+.gallery-brand > span img {
+  display: block;
+  height: 38px;
+  object-fit: contain;
   width: 38px;
 }
 .gallery-brand div {
