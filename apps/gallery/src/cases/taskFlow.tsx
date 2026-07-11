@@ -81,16 +81,19 @@ function pointOnPath(agent: Agent, progress: number): { x: number; y: number } {
 
 function AgentNode({
   agent,
-  index,
+  messagePlacement,
   reveal,
   showMessage,
 }: {
   agent: Agent;
-  index: number;
+  messagePlacement: "below" | "left" | "right";
   reveal: number;
   showMessage: boolean;
 }) {
   const progress = easeOutCubic(reveal);
+  const messageOffset = showMessage ? 0 : 10;
+  const messageTransform =
+    messagePlacement === "below" ? `translate(-50%, ${messageOffset}px)` : `translateY(${messageOffset}px)`;
   return (
     <div
       className="task-agent"
@@ -111,8 +114,8 @@ function AgentNode({
       <strong>{agent.label}</strong>
       <small>{agent.role}</small>
       <div
-        className={`task-message ${index > 1 ? "task-message-left" : ""}`}
-        style={{ opacity: showMessage ? 1 : 0, transform: `translateY(${showMessage ? 0 : 10}px)` }}
+        className={`task-message task-message-${messagePlacement}`}
+        style={{ opacity: showMessage ? 1 : 0, transform: messageTransform }}
       >
         {agent.message}
       </div>
@@ -193,8 +196,8 @@ export function TaskFlowSurface({ context, input }: SurfaceComponentProps) {
         return (
           <AgentNode
             agent={agent}
-            index={index}
             key={agent.label}
+            messagePlacement={index === 0 ? "left" : index === agents.length - 1 ? "right" : "below"}
             reveal={isVisible ? (entering ? progress : 1) : 0}
             showMessage={phase === "messages" && index < Math.ceil(progress * agents.length)}
           />

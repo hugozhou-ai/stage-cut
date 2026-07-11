@@ -669,31 +669,48 @@ p {
   font:
     500 10px "Lexend Variable",
     sans-serif;
-  left: 102px;
   padding: 10px 13px;
   position: absolute;
-  top: 3px;
   transition: 0.18s ease;
   white-space: nowrap;
 }
 .task-message::before {
-  border-color: transparent color-mix(in srgb, var(--agent-accent) 85%, #5865a8) transparent transparent;
   border-style: solid;
-  border-width: 6px 8px 6px 0;
   content: "";
-  left: -8px;
   position: absolute;
-  top: 19px;
 }
 .task-message-left {
-  left: auto;
-  right: 102px;
+  right: 160px;
+  top: 19px;
 }
 .task-message-left::before {
   border-color: transparent transparent transparent color-mix(in srgb, var(--agent-accent) 85%, #5865a8);
-  border-width: 6px 0 6px 8px;
-  left: auto;
-  right: -8px;
+  border-width: 7px 0 7px 7px;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.task-message-right {
+  left: 160px;
+  top: 19px;
+}
+.task-message-right::before {
+  border-color: transparent color-mix(in srgb, var(--agent-accent) 85%, #5865a8) transparent transparent;
+  border-width: 7px 7px 7px 0;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.task-message-below {
+  left: 50%;
+  top: 132px;
+}
+.task-message-below::before {
+  border-color: transparent transparent color-mix(in srgb, var(--agent-accent) 85%, #5865a8);
+  border-width: 0 7px 7px;
+  left: 50%;
+  top: -7px;
+  transform: translateX(-50%);
 }
 /* Message cluster */
 .message-cluster-surface {
