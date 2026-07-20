@@ -5,7 +5,6 @@ import {
   Clock3,
   Download,
   FileJson,
-  FileSpreadsheet,
   ImagePlus,
   Link2,
   Maximize2,
@@ -387,7 +386,7 @@ function GenerateScene({ progress }: { progress: number }) {
           </>
         }
       >
-        自动取色、自动匹配，整个过程只在浏览器本地完成。
+        MARD 221 色众数取色，背景移除可选；整个过程只在浏览器本地完成。
       </TopCopy>
       <div style={{ bottom: 190, left: 68, position: "absolute" }}>
         <WindowChrome>
@@ -478,7 +477,7 @@ function GenerateScene({ progress }: { progress: number }) {
                 }}
               >
                 <Sparkles size={22} />
-                已生成 32 × 32 图纸
+                已生成 80 × 80 图纸
               </div>
             </div>
           </div>
@@ -490,7 +489,7 @@ function GenerateScene({ progress }: { progress: number }) {
 
 function SizeScene({ progress }: { progress: number }) {
   const change = easeInOutCubic(clamp((progress - 0.28) / 0.34));
-  const width = Math.round(mix(32, 48, change));
+  const width = Math.round(mix(80, 120, change));
   const physical = Math.round(width * 0.5);
   return (
     <SceneFrame>
@@ -527,7 +526,7 @@ function SizeScene({ progress }: { progress: number }) {
                 alignItems: "end",
                 display: "grid",
                 gap: 18,
-                gridTemplateColumns: "1fr 210px 1fr",
+                gridTemplateColumns: "1fr 72px 1fr",
                 marginTop: 38,
               }}
             >
@@ -562,16 +561,15 @@ function SizeScene({ progress }: { progress: number }) {
                   gap: 8,
                   gridColumn: 2,
                   gridRow: 1,
-                  height: 105,
+                  height: 72,
                   justifyContent: "center",
                 }}
               >
-                <Link2 size={28} />
-                <strong style={{ fontSize: 17 }}>比例已锁定 1:1</strong>
+                <Link2 aria-label="比例已锁定" size={32} />
               </div>
             </div>
             <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(4,1fr)", marginTop: 42 }}>
-              {[16, 24, 32, 48].map((size) => (
+              {[32, 64, 120, 160].map((size) => (
                 <div
                   key={size}
                   style={{
@@ -615,7 +613,7 @@ function SizeScene({ progress }: { progress: number }) {
       </div>
       <BottomPill>
         <Link2 color={ORANGE} size={27} />
-        8–80 格自由设置
+        8–160 格自由设置
       </BottomPill>
     </SceneFrame>
   );
@@ -683,7 +681,7 @@ function EditScene({ progress }: { progress: number }) {
                   }}
                 >
                   <PaintBucket size={18} />
-                  填为 A09
+                  填为 C26
                 </span>
                 <span
                   style={{
@@ -830,9 +828,9 @@ function ZoomScene({ progress }: { progress: number }) {
 function MaterialsScene({ progress }: { progress: number }) {
   const enter = easeOutCubic(clamp((progress - 0.14) / 0.42));
   const items = [
-    { code: "A04", count: 244, name: "珊瑚红", color: "#ee6a5b" },
-    { code: "A05", count: 253, name: "莓果粉", color: "#d94e76" },
-    { code: "A06", count: 68, name: "樱花粉", color: "#f2a7bb" },
+    { code: "F9", count: 244, name: "红色系", color: "#e2677a" },
+    { code: "E7", count: 253, name: "粉色系", color: "#c63478" },
+    { code: "D7", count: 68, name: "紫色系", color: "#8854b3" },
   ];
   return (
     <SceneFrame>
@@ -841,11 +839,11 @@ function MaterialsScene({ progress }: { progress: number }) {
         progress={progress}
         title={
           <>
-            需要多少豆，<span style={{ color: ORANGE }}>直接算好。</span>
+            图纸和清单，<span style={{ color: ORANGE }}>放在一起。</span>
           </>
         }
       >
-        实时统计每种色号，一键导出图纸和带备料建议的清单。
+        每张高清 PNG 底部都附上色号、颜色名称和所需颗数。
       </TopCopy>
       <div
         style={{
@@ -875,7 +873,7 @@ function MaterialsScene({ progress }: { progress: number }) {
                   borderTop: "1px solid rgba(255,255,255,.1)",
                   display: "grid",
                   gap: 14,
-                  gridTemplateColumns: "42px 1fr auto",
+                  gridTemplateColumns: "48px 1fr auto",
                   padding: "23px 0",
                 }}
               >
@@ -884,47 +882,86 @@ function MaterialsScene({ progress }: { progress: number }) {
                     background: item.color,
                     borderRadius: "50%",
                     boxShadow: "inset 3px 3px rgba(255,255,255,.3)",
-                    height: 38,
-                    width: 38,
+                    height: 44,
+                    width: 44,
                   }}
                 />
                 <span>
-                  <strong style={{ display: "block", fontSize: 19 }}>{item.code}</strong>
-                  <small style={{ color: "#b8b0a6", fontSize: 15 }}>{item.name}</small>
+                  <strong style={{ display: "block", fontSize: 21 }}>{item.code}</strong>
+                  <small style={{ color: "#b8b0a6", fontSize: 16 }}>{item.name}</small>
                 </span>
-                <b style={{ fontSize: 24 }}>{item.count}</b>
+                <b style={{ fontSize: 26 }}>{item.count}</b>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          {[
-            { icon: <Download size={32} />, title: "带色号 PNG", text: "打印照着做" },
-            { icon: <FileJson size={32} />, title: "JSON 项目", text: "以后继续编辑" },
-            { icon: <FileSpreadsheet size={32} />, title: "材料 CSV", text: "自动加 10% 备料" },
-          ].map((item) => (
-            <div
-              key={item.title}
-              style={{
-                alignItems: "center",
-                background: CARD,
-                border: `1px solid ${LINE}`,
-                borderRadius: 22,
-                boxShadow: "0 16px 42px rgba(52,40,27,.08)",
-                display: "grid",
-                gap: 18,
-                gridTemplateColumns: "64px 1fr",
-                minHeight: 162,
-                padding: 28,
-              }}
-            >
-              <div style={{ color: ORANGE }}>{item.icon}</div>
-              <div>
-                <strong style={{ display: "block", fontSize: 25 }}>{item.title}</strong>
-                <span style={{ color: MUTED, display: "block", fontSize: 18, marginTop: 7 }}>{item.text}</span>
+        <div
+          style={{
+            background: CARD,
+            border: `1px solid ${LINE}`,
+            borderRadius: 28,
+            boxShadow: "0 16px 42px rgba(52,40,27,.08)",
+            minHeight: 790,
+            padding: 34,
+          }}
+        >
+          <div style={{ alignItems: "center", display: "flex", gap: 14 }}>
+            <Download color={ORANGE} size={32} />
+            <strong style={{ fontSize: 27 }}>拼豆板尺寸</strong>
+          </div>
+          <div style={{ color: MUTED, fontSize: 17, marginTop: 10 }}>导出高清带色号 PNG</div>
+          <div style={{ display: "grid", gap: 14, gridTemplateColumns: "1fr 1fr", marginTop: 34 }}>
+            {[52, 78, 104, 120].map((size) => (
+              <div
+                key={size}
+                style={{
+                  background: size === 52 ? "#fff2eb" : "#fff",
+                  border: `2px solid ${size === 52 ? "#efb29a" : LINE}`,
+                  borderRadius: 14,
+                  color: size === 52 ? ORANGE : INK,
+                  fontSize: 22,
+                  fontWeight: 900,
+                  padding: "21px 0",
+                  textAlign: "center",
+                }}
+              >
+                {size} × {size}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <div
+            style={{
+              background: "#faf6ee",
+              border: `1px solid ${LINE}`,
+              borderRadius: 18,
+              color: MUTED,
+              fontSize: 19,
+              fontWeight: 700,
+              lineHeight: 1.8,
+              marginTop: 30,
+              padding: 24,
+            }}
+          >
+            ✓ 图纸底部附材料清单<br />✓ 色号、名称、颗数齐全<br />✓ 拼豆板分界与行列号
+          </div>
+          <div
+            style={{
+              alignItems: "center",
+              background: ORANGE,
+              borderRadius: 14,
+              color: "#fff",
+              display: "flex",
+              fontSize: 22,
+              fontWeight: 900,
+              gap: 10,
+              justifyContent: "center",
+              marginTop: 30,
+              padding: 20,
+            }}
+          >
+            <Download size={24} />
+            导出图纸
+          </div>
         </div>
       </div>
     </SceneFrame>
