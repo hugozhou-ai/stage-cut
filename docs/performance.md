@@ -6,7 +6,8 @@ Stagecut guarantees algorithmic bounds rather than the rendering cost of applica
 
 - active Scene selection is O(log n);
 - one Scene is mounted normally and at most two during a transition;
-- the reference limit is therefore eight mounted Surfaces normally and sixteen during a transition;
+- the scene-window reference limit is eight mounted Surfaces normally and sixteen during a transition;
+- explicitly declared active persistent background/overlay layers add to that count; profile their cost separately;
 - repeated frame values do not notify controller subscribers;
 - package builds keep React and Remotion external.
 

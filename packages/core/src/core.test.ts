@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { compileStagecutVideo } from "./compiler";
 import { defineStagecutProject, safeParseStagecutProject, serializeStagecutProject } from "./project";
 import { progressForRange } from "./transitions";
-import type { StagecutProjectDefinition } from "./types";
+import type { StagecutProjectDefinition, VideoDefinition } from "./types";
 import { StagecutValidationError } from "./validation";
 
 function createProject(overrides: Partial<StagecutProjectDefinition> = {}) {
@@ -254,6 +254,58 @@ describe("project parsing", () => {
 });
 
 describe("video compilation", () => {
+  it("validates timed layers against scene duration and persistent layers against the overlapped video duration", () => {
+    const source = createProject();
+    const original = source.videos[0] as VideoDefinition;
+    const project = {
+      ...source,
+      videos: [
+        {
+          ...original,
+          backgroundLayers: [{ id: "world", surfaceId: "background" }],
+          overlayLayers: [{ id: "caption", surfaceId: "card", startFrame: 60, durationInFrames: 15 }],
+        },
+      ],
+    };
+    expect(compileStagecutVideo(project, "demo").timeline.durationInFrames).toBe(75);
+    const invalid = {
+      ...project,
+      videos: [
+        {
+          ...(project.videos[0] as VideoDefinition),
+          overlayLayers: [{ id: "caption", surfaceId: "card", startFrame: 60, durationInFrames: 16 }],
+        },
+      ],
+    };
+    expect(() => compileStagecutVideo(invalid, "demo")).toThrow("$.videos[0].overlayLayers[0]");
+    const scenes = original.scenes.map((scene, index) =>
+      index === 0 ? { ...scene, layers: [{ id: "bad", surfaceId: "card", startFrame: 30 }] } : scene,
+    );
+    expect(() => compileStagecutVideo({ ...source, videos: [{ ...original, scenes }] }, "demo")).toThrow(
+      "layer must have a positive range",
+    );
+  });
+
+  it("reports invalid persistent references and duplicate ids before compilation", () => {
+    const source = createProject();
+    const result = safeParseStagecutProject({
+      ...source,
+      videos: [
+        {
+          ...(source.videos[0] as VideoDefinition),
+          backgroundLayers: [
+            { id: "same", surfaceId: "missing" },
+            { id: "same", surfaceId: "card", startFrame: -1 },
+          ],
+        },
+      ],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success)
+      expect(result.error.issues.map(({ code }) => code)).toEqual(
+        expect.arrayContaining(["unknown_reference", "duplicate_id", "invalid_number"]),
+      );
+  });
   it("compiles overlapping scene transitions and preserves layer order", () => {
     const video = compileStagecutVideo(createProject(), "demo");
 

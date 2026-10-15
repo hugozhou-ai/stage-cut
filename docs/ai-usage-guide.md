@@ -18,8 +18,8 @@ Stagecut does:
 
 Stagecut does not:
 
-- Export MP4 or WebM.
-- Manage audio.
+- Export WebM through the current CLI (MP4 export is available in the optional `@stage-cut/render` package).
+- Provide a mixer, TTS service or automatic subtitle alignment (nested media is timed by its Layer).
 - Generate Surface component code.
 - Persist Devtools changes back to source files.
 - Act as a pixel-level visual editor.
@@ -31,6 +31,7 @@ Stagecut does not:
 | `packages/core` | Project types, validation, canonical JSON, transitions, and timeline compilation. No runtime dependencies. |
 | `packages/react` | React Surface registry, player, composition adapter, controller, and hooks. |
 | `packages/devtools` | Development-only launcher, Studio, draft editing, runtime inspection, and Agent Prompt generation. |
+| `packages/render` | Optional offline MP4 export, keyframes, contact sheets, repeatability checks and structured feedback. |
 | `apps/gallery` | Production-style examples built only with public Stagecut APIs. |
 
 When changing behavior, put it in the package that owns that responsibility. Do not add reusable runtime behavior to
@@ -52,7 +53,7 @@ Project
 Important distinctions:
 
 - A Surface declaration is JSON. Its React implementation lives in the Surface registry.
-- A Scene owns duration. Every Layer in that Scene receives the same frame range.
+- A Scene owns duration. Layers may specify independent `startFrame` and `durationInFrames` within it.
 - Scene order defines playback order. Layers are rendered in array order, bottom to top.
 - `inputProps` contains static JSON data. Frame-dependent state comes from the Surface render context.
 - `transitionToNext` belongs to the outgoing Scene. The final Scene cannot define it.
@@ -443,3 +444,7 @@ tests, type checks, build output, package validation, and consumer tests are the
 - [ ] Obsolete code from refactors has been removed.
 - [ ] Required verification commands pass.
 - [ ] Commits follow Conventional Commits.
+
+## Video creation extension
+
+Read [scene-to-film](scene-to-film.md) for persistent worlds, independent Layer timing, `StagecutResource` and local media clocks. Use [the render CLI/SDK](../packages/render/README.md) for output and actual encoded-media verification. `StagecutRenderRoot` derives all composition dimensions and durations from the project.

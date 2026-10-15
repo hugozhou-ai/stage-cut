@@ -942,7 +942,9 @@ function MaterialsScene({ progress }: { progress: number }) {
               padding: 24,
             }}
           >
-            ✓ 图纸底部附材料清单<br />✓ 色号、名称、颗数齐全<br />✓ 拼豆板分界与行列号
+            ✓ 图纸底部附材料清单
+            <br />✓ 色号、名称、颗数齐全
+            <br />✓ 拼豆板分界与行列号
           </div>
           <div
             style={{

@@ -1,3 +1,4 @@
+import { resolveLayerRange } from "./layers";
 import { normalizeTransition } from "./transitions";
 import type {
   CompiledScene,
@@ -98,6 +99,17 @@ export function compileStagecutVideo<TMetadata extends JsonObject = JsonObject>(
   }
 
   const durationInFrames = scenes.at(-1)?.endFrame ?? 0;
+  const videoPath = `$.videos[${project.videos.indexOf(video)}]`;
+  for (const item of scenes) {
+    item.scene.layers.forEach((layer, index) => {
+      resolveLayerRange(layer, item.scene.durationInFrames, `${videoPath}.scenes[${item.index}].layers[${index}]`);
+    });
+  }
+  for (const field of ["backgroundLayers", "overlayLayers"] as const) {
+    video[field]?.forEach((layer, index) => {
+      resolveLayerRange(layer, durationInFrames, `${videoPath}.${field}[${index}]`);
+    });
+  }
   const findActiveSceneIndex = (frame: number): number => {
     assertFrame(frame, durationInFrames);
     let low = 0;

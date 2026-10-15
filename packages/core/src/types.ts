@@ -38,6 +38,10 @@ export interface LayerDefinition<
   TInputProps extends JsonObject = JsonObject,
   TMetadata extends JsonObject = JsonObject,
 > {
+  /** Start relative to the owning scene, or the video for persistent layers. */
+  startFrame?: number;
+  /** Defaults to the remaining owner duration. The end is exclusive. */
+  durationInFrames?: number;
   id: string;
   inputProps?: TInputProps;
   metadata?: TMetadata;
@@ -61,6 +65,10 @@ export interface PlaybackOptions {
 }
 
 export interface VideoDefinition<TMetadata extends JsonObject = JsonObject> {
+  /** Mounted independently of scene cuts, below all scenes. */
+  backgroundLayers?: readonly LayerDefinition[];
+  /** Mounted independently of scene cuts, above all scenes. */
+  overlayLayers?: readonly LayerDefinition[];
   clipContent?: boolean;
   defaultTransition?: TransitionConfig;
   description?: string;

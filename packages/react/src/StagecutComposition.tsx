@@ -1,6 +1,12 @@
-import { type CompiledScene, type CompiledStagecutVideo, progressForRange } from "@stage-cut/core";
+import {
+  type CompiledScene,
+  type CompiledStagecutVideo,
+  type LayerDefinition,
+  progressForRange,
+  resolveLayerRange,
+} from "@stage-cut/core";
 import type { CSSProperties } from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Sequence, useCurrentFrame } from "remotion";
 import { resolveTransitionStyle } from "./transitionStyles";
 import type { FrameRenderContext, SurfaceComponent, SurfaceComponentMap } from "./types";
 
@@ -59,29 +65,79 @@ function Scene({
   const localFrame = absoluteFrame - item.startFrame;
   return (
     <AbsoluteFill style={createSceneStyle(item, absoluteFrame, video.clipContent, interactive, isActive)}>
-      {item.scene.layers.map((layer) => {
+      <Layers
+        absoluteFrame={absoluteFrame}
+        duration={item.scene.durationInFrames}
+        interactive={interactive && isActive}
+        layers={item.scene.layers}
+        ownerFrame={localFrame}
+        sceneId={item.scene.id}
+        scope="scene"
+        surfaces={surfaces}
+        video={video}
+      />
+    </AbsoluteFill>
+  );
+}
+
+function Layers({
+  absoluteFrame,
+  duration,
+  interactive,
+  layers,
+  ownerFrame,
+  sceneId,
+  scope,
+  surfaces,
+  video,
+}: {
+  absoluteFrame: number;
+  duration: number;
+  interactive: boolean;
+  layers: readonly LayerDefinition[];
+  ownerFrame: number;
+  sceneId: string;
+  scope: FrameRenderContext["scope"];
+  surfaces: SurfaceComponentMap;
+  video: CompiledStagecutVideo;
+}) {
+  return (
+    <>
+      {layers.map((layer) => {
+        const range = resolveLayerRange(layer, duration);
+        if (ownerFrame < range.startFrame || ownerFrame >= range.endFrame) return null;
         const Surface = surfaces[layer.surfaceId] as SurfaceComponent | undefined;
         if (!Surface) {
           throw new Error(
-            `Stagecut scene references an unregistered surface: ${JSON.stringify({ sceneId: item.scene.id, surfaceId: layer.surfaceId })}`,
+            `Stagecut layer references an unregistered surface: ${JSON.stringify({ sceneId, scope, layerId: layer.id, surfaceId: layer.surfaceId })}`,
           );
         }
         const context: FrameRenderContext = {
           fps: video.fps,
           globalFrame: absoluteFrame,
           layerId: layer.id,
-          localFrame,
-          progress: progressForRange(localFrame, item.scene.durationInFrames),
-          sceneId: item.scene.id,
+          localFrame: ownerFrame - range.startFrame,
+          ownerFrame,
+          durationInFrames: range.durationInFrames,
+          progress: progressForRange(ownerFrame - range.startFrame, range.durationInFrames),
+          sceneId,
+          scope,
         };
         const input = layer.inputProps ?? {};
         return (
-          <AbsoluteFill key={layer.id} style={{ pointerEvents: interactive && isActive ? "auto" : "none" }}>
-            <Surface context={context} input={input} />
-          </AbsoluteFill>
+          <Sequence
+            key={layer.id}
+            from={absoluteFrame - ownerFrame + range.startFrame}
+            durationInFrames={range.durationInFrames}
+            layout="none"
+          >
+            <AbsoluteFill style={{ pointerEvents: interactive ? "auto" : "none" }}>
+              <Surface context={context} input={input} />
+            </AbsoluteFill>
+          </Sequence>
         );
       })}
-    </AbsoluteFill>
+    </>
   );
 }
 
@@ -97,6 +153,17 @@ export function StagecutComposition({ interactive = false, surfaces, video }: St
         pointerEvents: interactive ? "auto" : "none",
       }}
     >
+      <Layers
+        absoluteFrame={absoluteFrame}
+        duration={video.timeline.durationInFrames}
+        interactive={interactive}
+        layers={video.video.backgroundLayers ?? []}
+        ownerFrame={absoluteFrame}
+        sceneId=""
+        scope="background"
+        surfaces={surfaces}
+        video={video}
+      />
       {renderWindow.map((item) => (
         <Scene
           absoluteFrame={absoluteFrame}
@@ -108,6 +175,17 @@ export function StagecutComposition({ interactive = false, surfaces, video }: St
           video={video}
         />
       ))}
+      <Layers
+        absoluteFrame={absoluteFrame}
+        duration={video.timeline.durationInFrames}
+        interactive={interactive}
+        layers={video.video.overlayLayers ?? []}
+        ownerFrame={absoluteFrame}
+        sceneId=""
+        scope="overlay"
+        surfaces={surfaces}
+        video={video}
+      />
     </AbsoluteFill>
   );
 }
