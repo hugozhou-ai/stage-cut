@@ -155,6 +155,15 @@ function diffLayers(
       previous.inputProps ?? {},
       layer.inputProps ?? {},
     );
+    for (const field of ["startFrame", "durationInFrames"] as const) {
+      pushFieldChange(
+        operations,
+        { layerId: layer.id, sceneId, videoId },
+        `change-layer-${field}`,
+        previous[field],
+        layer[field],
+      );
+    }
   }
   pushFieldChange(
     operations,
@@ -166,6 +175,9 @@ function diffLayers(
 }
 
 function diffVideo(operations: DevtoolsChangeOperation[], before: VideoDefinition, after: VideoDefinition): void {
+  for (const field of ["backgroundLayers", "overlayLayers"] as const) {
+    pushFieldChange(operations, { videoId: before.id }, `change-${field}`, before[field], after[field]);
+  }
   const beforeById = new Map(before.scenes.map((scene) => [scene.id, scene]));
   const afterById = new Map(after.scenes.map((scene) => [scene.id, scene]));
   for (const scene of before.scenes) {

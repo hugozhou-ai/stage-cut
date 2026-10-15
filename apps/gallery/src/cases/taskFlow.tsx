@@ -154,7 +154,10 @@ export function TaskFlowSurface({
       <div className="case-kicker">CROSS-FUNCTIONAL PROJECT FLOW</div>
       <div className="task-prompt">
         <span>{prompt.slice(0, typedCharacters)}</span>
-        <i className="typing-caret" />
+        <i
+          className="typing-caret"
+          style={{ opacity: Math.floor(context.globalFrame / (context.fps * 0.35)) % 2 === 0 ? 1 : 0 }}
+        />
         <b>
           <GalleryIcon name="command" size={20} />
         </b>

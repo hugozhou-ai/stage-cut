@@ -583,18 +583,12 @@ p {
   transform: translateX(-50%);
 }
 .typing-caret {
-  animation: caret-blink 0.7s steps(1) infinite;
   background: #8794ff;
   display: inline-block;
   height: 1em;
   margin-left: 4px;
   vertical-align: -0.12em;
   width: 2px;
-}
-@keyframes caret-blink {
-  50% {
-    opacity: 0;
-  }
 }
 
 /* Task flow */

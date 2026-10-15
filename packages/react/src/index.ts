@@ -9,6 +9,10 @@ export { StagecutComposition } from "./StagecutComposition";
 export type { StagecutPlayerProps } from "./StagecutPlayer";
 export { StagecutPlayer } from "./StagecutPlayer";
 export { createStagecutPlayerController, StagecutPlayerService } from "./StagecutPlayerService";
+export type { StagecutRenderRootProps } from "./StagecutRenderRoot";
+export { StagecutRenderRoot } from "./StagecutRenderRoot";
+export type { StagecutResourceProps } from "./StagecutResource";
+export { StagecutResource } from "./StagecutResource";
 export { resolveTransitionStyle } from "./transitionStyles";
 export type {
   FrameRenderContext,

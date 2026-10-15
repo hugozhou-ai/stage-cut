@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 
 const LOG_PREFIX = "[stagecut:consumer-check]";
 const root = resolve(import.meta.dirname, "..");
-const artifacts = join(root, ".artifacts");
+const artifacts = await mkdtemp(join(tmpdir(), "stagecut-consumer-packages-"));
 
 function run(command, args, cwd) {
   console.log(`${LOG_PREFIX} ${JSON.stringify({ args, command, cwd, event: "command-start" })}`);
@@ -13,8 +13,6 @@ function run(command, args, cwd) {
 }
 
 async function packPackages() {
-  await rm(artifacts, { force: true, recursive: true });
-  await mkdir(artifacts, { recursive: true });
   run("pnpm", ["--filter", "@stage-cut/core", "run", "build"], root);
   run("pnpm", ["--filter", "@stage-cut/react-player", "run", "build"], root);
   run("pnpm", ["--filter", "@stage-cut/devtools", "run", "build"], root);
@@ -116,7 +114,11 @@ async function verifyNext(tarballs) {
   console.log(`${LOG_PREFIX} ${JSON.stringify({ event: "next-consumer-passed", nextVersion: "16.2.10" })}`);
 }
 
-const tarballs = await packPackages();
-await verifyVite(tarballs, "18.3.1");
-await verifyVite(tarballs, "19.2.4");
-await verifyNext(tarballs);
+try {
+  const tarballs = await packPackages();
+  await verifyVite(tarballs, "18.3.1");
+  await verifyVite(tarballs, "19.2.4");
+  await verifyNext(tarballs);
+} finally {
+  await rm(artifacts, { force: true, recursive: true });
+}

@@ -10,7 +10,7 @@
 
 StageCut 是一个可交互、逐帧精确的动画引擎，用于构建和播放 DOM 视频体验。项目定义为便于移植的 JSON 格式；React Surface 组件负责渲染；编译后的场景时间表确保有界且可预测的播放性能。
 
-StageCut 仅为浏览器播放设计，不提供 MP4/WebM 导出、音频管理或可视化编辑器。
+StageCut 的浏览器播放器可配合可选的 `@stage-cut/render` 导出包使用，支持 MP4、关键帧、联系表与机器可读反馈。音视频可以作为定时 Surface 播放；项目不提供混音台或像素级可视化编辑器。参见[视频制作工作流](docs/scene-to-film.md)。导出包目前仅在本地实现，尚未发布 npm。
 
 > **生产环境实践：** [tutti.sh](https://tutti.sh/) —— 一个让人与 Agent *「同频」* 创造的地方 —— 其官网动画即基于 StageCut 构建。查看真实实现：[tutti-os/tutti](https://github.com/tutti-os/tutti)。
 
@@ -137,3 +137,17 @@ pnpm test:coverage
 提交 Pull Request 前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。安全漏洞请按 [SECURITY.md](SECURITY.md) 中的流程报告。
 
 StageCut 以 [MIT License](LICENSE) 开源。
+
+## 视频制作与导出
+
+1.0 迁移说明：[帧时钟、持久图层与导出](docs/migration-1.0.md)。
+
+`backgroundLayers` 承载持续世界与音乐，`overlayLayers` 编排跨场景字幕。图层支持独立的 `startFrame` 与 `durationInFrames`。使用 `StagecutResource` 等待资源、`StagecutRenderRoot` 自动声明所有影片。
+
+```bash
+pnpm stagecut inspect --entry apps/grotto/render.tsx
+pnpm stagecut render --entry apps/grotto/render.tsx --id one-lamp --out .artifacts/review --frames 96,384,696 --stills-only
+pnpm grotto:render
+```
+
+接口详见[渲染包](packages/render/README.md)，Agent 创作流程见 [SKILL.md](skills/stagecut-video/SKILL.md)。

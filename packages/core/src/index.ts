@@ -1,4 +1,5 @@
 export { compileStagecutVideo } from "./compiler";
+export { resolveLayerRange } from "./layers";
 export {
   defineStagecutProject,
   parseStagecutProject,

@@ -1,0 +1,24 @@
+{
+  "name": "@stage-cut/grotto",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node ../../scripts/render-stagecut.mjs --entry render.tsx --id one-lamp --out ../../.artifacts/grotto",
+    "type-check": "tsc -b"
+  },
+  "dependencies": {
+    "@stage-cut/core": "workspace:*",
+    "@stage-cut/react-player": "workspace:*",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@remotion/bundler": "4.0.482",
+    "@remotion/renderer": "4.0.482",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "remotion": "4.0.482",
+    "typescript": "^5.9.3"
+  }
+}

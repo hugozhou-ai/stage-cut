@@ -1,0 +1,26 @@
+{
+  "name": "@stage-cut/promo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node scripts/render.mjs",
+    "type-check": "tsc -b"
+  },
+  "dependencies": {
+    "@fontsource-variable/lexend": "5.2.11",
+    "@stage-cut/core": "workspace:*",
+    "@stage-cut/react-player": "workspace:*",
+    "lucide-react": "1.17.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@remotion/bundler": "4.0.482",
+    "@remotion/renderer": "4.0.482",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "remotion": "4.0.482",
+    "typescript": "^5.9.3"
+  }
+}

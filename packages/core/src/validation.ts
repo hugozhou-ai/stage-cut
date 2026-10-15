@@ -140,8 +140,21 @@ class ProjectParser {
   }
 
   private layer(input: unknown, path: string): LayerDefinition {
-    const layer = this.record(input, path, ["id", "inputProps", "metadata", "surfaceId"]);
+    const layer = this.record(input, path, [
+      "id",
+      "inputProps",
+      "metadata",
+      "surfaceId",
+      "startFrame",
+      "durationInFrames",
+    ]);
     return {
+      ...(layer.startFrame === undefined
+        ? {}
+        : { startFrame: this.nonNegativeInteger(layer.startFrame, `${path}.startFrame`) }),
+      ...(layer.durationInFrames === undefined
+        ? {}
+        : { durationInFrames: this.positiveInteger(layer.durationInFrames, `${path}.durationInFrames`) }),
       id: this.id(layer.id, `${path}.id`),
       ...(layer.inputProps === undefined
         ? {}
@@ -313,6 +326,17 @@ class ProjectParser {
       if (!stageIds.has(video.stageId)) {
         this.issue("unknown_reference", `${videoPath}.stageId`, `references unknown stage "${video.stageId}"`);
       }
+      for (const field of ["backgroundLayers", "overlayLayers"] as const) {
+        video[field]?.forEach((layer, index) => {
+          if (!surfaceIds.has(layer.surfaceId)) {
+            this.issue(
+              "unknown_reference",
+              `${videoPath}.${field}[${index}].surfaceId`,
+              `references unknown surface "${layer.surfaceId}"`,
+            );
+          }
+        });
+      }
       video.scenes.forEach((scene, sceneIndex) => {
         const scenePath = `${videoPath}.scenes[${sceneIndex}]`;
         scene.layers.forEach((layer, layerIndex) => {
@@ -333,6 +357,8 @@ class ProjectParser {
 
   private video(input: unknown, path: string): VideoDefinition {
     const video = this.record(input, path, [
+      "backgroundLayers",
+      "overlayLayers",
       "clipContent",
       "defaultTransition",
       "description",
@@ -349,7 +375,18 @@ class ProjectParser {
     );
     this.requireNonEmpty(scenes, `${path}.scenes`);
     this.uniqueIds(scenes, `${path}.scenes`);
+    const persistent: Pick<VideoDefinition, "backgroundLayers" | "overlayLayers"> = {};
+    for (const field of ["backgroundLayers", "overlayLayers"] as const) {
+      if (video[field] !== undefined) {
+        const layers = this.array(video[field], `${path}.${field}`).map((layer, index) =>
+          this.layer(layer, `${path}.${field}[${index}]`),
+        );
+        this.uniqueIds(layers, `${path}.${field}`);
+        persistent[field] = layers;
+      }
+    }
     return {
+      ...persistent,
       ...(video.clipContent === undefined
         ? {}
         : { clipContent: this.boolean(video.clipContent, `${path}.clipContent`) }),

@@ -17,6 +17,8 @@ export interface StagecutPlayerProps {
   controllerRef?: Ref<StagecutPlayerService>;
   controls?: boolean;
   interactive?: boolean;
+  initiallyMuted?: boolean;
+  showVolumeControls?: boolean;
   onError?: (error: Error) => void;
   style?: CSSProperties;
   surfaces: SurfaceComponentMap;
@@ -47,6 +49,8 @@ export function StagecutPlayer({
   controllerRef,
   controls,
   interactive = false,
+  initiallyMuted = true,
+  showVolumeControls = false,
   onError,
   style,
   surfaces,
@@ -59,7 +63,15 @@ export function StagecutPlayer({
   const fallbackController = useStagecutPlayerController(video);
   const controller = externalController ?? fallbackController;
   const surfaceIds = useMemo(
-    () => [...new Set(video.video.scenes.flatMap((scene) => scene.layers.map((layer) => layer.surfaceId)))],
+    () => [
+      ...new Set(
+        [
+          ...(video.video.backgroundLayers ?? []),
+          ...video.video.scenes.flatMap((scene) => scene.layers),
+          ...(video.video.overlayLayers ?? []),
+        ].map((layer) => layer.surfaceId),
+      ),
+    ],
     [video],
   );
   assertVideoSurfaceRegistry(surfaceIds, surfaces);
@@ -139,13 +151,12 @@ export function StagecutPlayer({
       controls={controls ?? video.playback.controls}
       durationInFrames={video.timeline.durationInFrames}
       fps={video.fps}
-      initiallyMuted
+      initiallyMuted={initiallyMuted}
       inputProps={{ interactive, surfaces, video }}
       loop={video.playback.loop}
       moveToBeginningWhenEnded={false}
-      numberOfSharedAudioTags={0}
       ref={playerRef}
-      showVolumeControls={false}
+      showVolumeControls={showVolumeControls}
       style={mergedStyle}
     />
   );

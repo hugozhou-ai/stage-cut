@@ -10,7 +10,7 @@
 
 StageCut is an interactive, frame-precise animation engine for building and playing DOM video experiences with React. Projects are defined as portable JSON; React Surface components handle rendering; a compiled scene timeline ensures bounded, predictable playback performance.
 
-StageCut is designed for browser playback only. It does not provide MP4/WebM export, audio management, or a visual editor.
+The browser player is complemented by the optional `@stage-cut/render` package for MP4 export, keyframes, contact sheets and machine-readable feedback. Audio/video can run inside timed Surfaces; StageCut does not provide a mixer or a pixel-level visual editor. See [the agent video workflow](docs/scene-to-film.md).
 
 > **Used in production:** [tutti.sh](https://tutti.sh/) — *"Where people and agents build in tune"*, a real-time shared workspace for people and AI agents — builds its site animations with StageCut. See the real implementation at [tutti-os/tutti](https://github.com/tutti-os/tutti) on GitHub.
 
@@ -124,6 +124,20 @@ Open the application with `?stagecut` to reveal the global launcher. It opens `?
 you can preview the real Surface components, edit scenes, transitions, layers, and input props, inspect runtime frame
 state, and copy the resulting changes as an Agent Prompt. Drafts live only in the current tab's `sessionStorage` and
 never modify source files directly.
+
+## Video creation and export
+
+Version 1.0 migration notes: [frame clocks, persistent layers and export](docs/migration-1.0.md).
+
+Use `StagecutRenderRoot` to expose project videos to the optional renderer. Persistent worlds and music use `backgroundLayers`; cross-scene titles and captions use `overlayLayers`. Each Layer can specify its own `startFrame` and `durationInFrames`. `StagecutResource` synchronizes resource preparation with capture.
+
+```bash
+pnpm stagecut inspect --entry apps/grotto/render.tsx
+pnpm stagecut render --entry apps/grotto/render.tsx --id one-lamp --out .artifacts/review --frames 96,384,696 --stills-only
+pnpm grotto:render
+```
+
+See [render CLI/SDK](packages/render/README.md), [workflow](docs/scene-to-film.md), and the repository [agent skill](skills/stagecut-video/SKILL.md). The render package is implemented locally and has not yet been published to npm.
 
 ## Verification
 

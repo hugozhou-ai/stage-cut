@@ -1,0 +1,33 @@
+{
+  "title": "一灯入微 / A Light Within",
+  "purpose": "Original StageCut regression sample; not a reconstruction of ILLUMINE.",
+  "picture": "Procedural WebGL room and bounded reflections; AI-generated mural and 2.5D statue image.",
+  "images": {
+    "tool": "Built-in image_gen",
+    "files": ["public/mural.png", "public/statue.png"],
+    "prompts": [
+      "Original flat Buddhist-inspired Silk Road fresco texture on cracked ochre plaster. Central serene bodhisattva, smaller flying celestial figures, lotus vines. Mineral azurite, malachite, vermilion, sandstone, old gold. Tang-inspired hand-painted linework, aged pigment, evenly lit front-facing surface. No perspective, architecture, text or watermark.",
+      "Isolated full frontal seated Tang-inspired Buddha statue on a carved lotus pedestal. Serene facial features, curled hair, flowing carved robes, meditation hands. Museum-quality aged gilt bronze, subtle turquoise patina, soft neutral light. Transparent background. No halo, ground, room, text or watermark."
+    ]
+  },
+  "score": {
+    "file": "public/score.wav",
+    "method": "Original deterministic NumPy synthesis; seed 731; stereo bowls, drones, filtered air and delayed reflections.",
+    "regenerate": "uv run --with numpy python apps/grotto/score.py"
+  },
+  "narration": {
+    "files": ["public/voice-0.mp3", "public/voice-1.mp3", "public/voice-2.mp3", "public/voice-3.mp3"],
+    "voice": "zh-CN-YunxiNeural",
+    "rate": "-18%",
+    "pitch": "-5Hz",
+    "method": "edge-tts speech synthesis; generated assets are included. Regeneration requires external service access."
+  },
+  "font": {
+    "name": "Noto Serif CJK SC",
+    "license": "SIL OFL 1.1",
+    "licenseFile": "public/FONT-LICENSE.txt",
+    "source": "https://github.com/notofonts/noto-cjk/tree/main/Serif",
+    "file": "public/serif.woff2"
+  },
+  "render": "pnpm grotto:render"
+}

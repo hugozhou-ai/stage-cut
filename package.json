@@ -1,7 +1,7 @@
 {
   "name": "stagecut",
   "private": true,
-  "version": "0.5.0-beta.2",
+  "version": "1.0.0",
   "type": "module",
   "engines": {
     "node": ">=20 <25",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "pnpm run build:packages && pnpm --filter @stage-cut/gallery run build",
-    "build:packages": "pnpm --filter @stage-cut/core run build && pnpm --filter @stage-cut/react-player run build && pnpm --filter @stage-cut/devtools run build",
+    "build:packages": "pnpm --filter @stage-cut/core run build && pnpm --filter @stage-cut/react-player run build && pnpm --filter @stage-cut/devtools run build && pnpm --filter @stage-cut/render run build",
     "changeset": "changeset",
     "changeset:status": "changeset status",
     "commitlint": "node scripts/check-conventional-commits.mjs",
@@ -17,15 +17,20 @@
     "format": "pnpm exec biome check --write .",
     "gallery:render": "pnpm run build:packages && pnpm --filter @stage-cut/gallery run render",
     "lint": "pnpm exec biome check .",
-    "pack:check": "pnpm run build:packages && pnpm size:check && pnpm --filter @stage-cut/core exec publint && pnpm --filter @stage-cut/react-player exec publint && pnpm --filter @stage-cut/devtools exec publint && pnpm --filter @stage-cut/core exec attw --pack . && pnpm --filter @stage-cut/react-player exec attw --pack . && pnpm --filter @stage-cut/devtools exec attw --pack .",
+    "promo:render": "pnpm run build:packages && pnpm --filter @stage-cut/promo run render",
+    "pack:check": "pnpm run build:packages && pnpm size:check && pnpm --filter @stage-cut/core exec publint && pnpm --filter @stage-cut/react-player exec publint && pnpm --filter @stage-cut/devtools exec publint && pnpm --filter @stage-cut/core exec attw --pack . && pnpm --filter @stage-cut/react-player exec attw --pack . && pnpm --filter @stage-cut/devtools exec attw --pack . && pnpm --filter @stage-cut/render exec publint && pnpm --filter @stage-cut/render exec attw --pack .",
     "release": "changeset publish",
     "size:check": "node scripts/check-package-size.mjs",
-    "test": "pnpm run build:packages && pnpm --filter @stage-cut/core run test && pnpm --filter @stage-cut/react-player run test && pnpm --filter @stage-cut/devtools run test",
+    "test": "pnpm run build:packages && pnpm --filter @stage-cut/core run test && pnpm --filter @stage-cut/react-player run test && pnpm --filter @stage-cut/devtools run test && pnpm --filter @stage-cut/render run test",
     "test:coverage": "pnpm run build:packages && pnpm --filter @stage-cut/core run test:coverage && pnpm --filter @stage-cut/react-player run test:coverage && pnpm --filter @stage-cut/devtools run test:coverage",
     "test:consumers": "node scripts/verify-package-consumers.mjs",
-    "type-check": "pnpm --filter @stage-cut/core run type-check && pnpm --filter @stage-cut/react-player run type-check && pnpm --filter @stage-cut/devtools run type-check && pnpm --filter @stage-cut/gallery run type-check",
+    "type-check": "pnpm --filter @stage-cut/core run type-check && pnpm --filter @stage-cut/react-player run type-check && pnpm --filter @stage-cut/devtools run type-check && pnpm --filter @stage-cut/gallery run type-check && pnpm --filter @stage-cut/promo run type-check && pnpm --filter @stage-cut/grotto run type-check",
     "verify": "pnpm lint && pnpm changeset:status && pnpm type-check && pnpm test && pnpm build && pnpm pack:check",
-    "verify:release": "pnpm verify && pnpm test:consumers"
+    "verify:release": "pnpm verify && pnpm test:consumers",
+    "render:film": "node scripts/render-stagecut.mjs",
+    "grotto:render": "pnpm run build:packages && pnpm --filter @stage-cut/grotto run render",
+    "stagecut": "node packages/render/src/cli.mjs",
+    "test:render": "pnpm build:packages && node scripts/verify-video-output.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

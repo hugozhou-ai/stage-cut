@@ -6,6 +6,10 @@ export interface FrameRenderContext {
   globalFrame: number;
   layerId: string;
   localFrame: number;
+  /** Clock of the scene, or the video for persistent layers. */
+  ownerFrame: number;
+  durationInFrames: number;
+  scope: "scene" | "background" | "overlay";
   progress: number;
   sceneId: string;
 }
@@ -21,8 +25,13 @@ export type SurfaceComponent<TInputProps extends JsonObject = JsonObject> = Comp
 
 export type SurfaceComponentMap = Readonly<Record<string, unknown>>;
 
+type OptionalLayers<TVideo, TKey extends PropertyKey> = TVideo extends { [K in TKey]: readonly (infer L)[] }
+  ? L
+  : never;
 type ProjectLayer<TProject extends StagecutProjectDefinition> =
-  TProject["videos"][number]["scenes"][number]["layers"][number];
+  | TProject["videos"][number]["scenes"][number]["layers"][number]
+  | OptionalLayers<TProject["videos"][number], "backgroundLayers">
+  | OptionalLayers<TProject["videos"][number], "overlayLayers">;
 
 type InputForLayer<TLayer> = [TLayer] extends [never]
   ? JsonObject

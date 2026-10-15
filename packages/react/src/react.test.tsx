@@ -1,6 +1,6 @@
 import { compileStagecutVideo, defineStagecutProject, type TransitionName } from "@stage-cut/core";
 import { act, render, renderHook, screen } from "@testing-library/react";
-import { StrictMode } from "react";
+import { StrictMode, useEffect } from "react";
 import { renderToString } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useStagecutPlayerController, useStagecutPlayerPlaybackState, useStagecutPlayerState } from "./hooks";
@@ -8,10 +8,26 @@ import { defineSurfaceRegistry } from "./registry";
 import { StagecutComposition } from "./StagecutComposition";
 import { StagecutPlayer } from "./StagecutPlayer";
 import { StagecutPlayerService } from "./StagecutPlayerService";
+import { StagecutResource } from "./StagecutResource";
 import { resolveTransitionStyle } from "./transitionStyles";
 import type { FrameRenderContext } from "./types";
 
 const remotionState = vi.hoisted(() => ({ frame: 0 }));
+const resourceGates = vi.hoisted(() => {
+  let next = 0;
+  const pending = new Set<number>();
+  return {
+    pending,
+    delay: () => {
+      pending.add(++next);
+      return next;
+    },
+    resume: (handle: number) => {
+      pending.delete(handle);
+    },
+    cancel: vi.fn(),
+  };
+});
 const playerState = vi.hoisted(() => ({
   frame: 0,
   listeners: new Map<string, Set<(event?: unknown) => void>>(),
@@ -23,6 +39,12 @@ const playerState = vi.hoisted(() => ({
 }));
 
 vi.mock("remotion", () => ({
+  useDelayRender: () => ({
+    delayRender: resourceGates.delay,
+    continueRender: resourceGates.resume,
+    cancelRender: resourceGates.cancel,
+  }),
+  Sequence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
   AbsoluteFill: ({ children, style }: { children?: React.ReactNode; style?: React.CSSProperties }) => (
     <div data-testid="absolute-fill" style={style}>
       {children}
@@ -129,6 +151,8 @@ function createFakePlayer(currentFrame = 0, initiallyPlaying = false) {
 }
 
 beforeEach(() => {
+  resourceGates.pending.clear();
+  resourceGates.cancel.mockReset();
   remotionState.frame = 0;
   playerState.frame = 0;
   playerState.listeners.clear();
@@ -137,6 +161,64 @@ beforeEach(() => {
   playerState.playing = false;
   playerState.props = {};
   playerState.seekTo.mockReset();
+});
+
+describe("StagecutResource", () => {
+  it("blocks capture until consumers mount, preserves resources on frame changes, and disposes on unmount", async () => {
+    const dispose = vi.fn();
+    let resolve: (value: string) => void = () => {
+      throw new Error("loader not called");
+    };
+    const load = vi.fn(
+      () =>
+        new Promise<string>((done) => {
+          resolve = done;
+        }),
+    );
+    const view = render(
+      <StagecutResource id="texture" load={load} dispose={dispose}>
+        {(value) => <span>{value}</span>}
+      </StagecutResource>,
+    );
+    expect(resourceGates.pending.size).toBe(1);
+    await act(async () => {
+      await Promise.resolve();
+      resolve("loaded texture");
+    });
+    expect(screen.getByText("loaded texture")).toBeTruthy();
+    expect(resourceGates.pending.size).toBe(0);
+    view.rerender(
+      <StagecutResource id="texture" load={load} dispose={dispose}>
+        {(value) => <span>{value}</span>}
+      </StagecutResource>,
+    );
+    expect(load).toHaveBeenCalledTimes(1);
+    view.unmount();
+    expect(dispose).toHaveBeenCalledWith("loaded texture");
+  });
+
+  it("releases aborted gates and disposes late assets under StrictMode", async () => {
+    const pending: ((value: string) => void)[] = [];
+    const dispose = vi.fn();
+    const load = () => new Promise<string>((done) => pending.push(done));
+    const view = render(
+      <StrictMode>
+        <StagecutResource id="asset" load={load} dispose={dispose}>
+          {(value) => <span>{value}</span>}
+        </StagecutResource>
+      </StrictMode>,
+    );
+    await act(async () => {
+      await Promise.resolve();
+    });
+    view.unmount();
+    expect(resourceGates.pending.size).toBe(0);
+    await act(async () => {
+      for (const done of pending) done("late asset");
+    });
+    expect(dispose).toHaveBeenCalledTimes(pending.length);
+    expect(resourceGates.cancel).not.toHaveBeenCalled();
+  });
 });
 
 describe("surface registry", () => {
@@ -176,6 +258,49 @@ describe("surface registry", () => {
 });
 
 describe("StagecutComposition", () => {
+  it("keeps a persistent world mounted through cuts and supports out-of-order layer sampling", () => {
+    const { project } = createRuntime();
+    const mounted = vi.fn();
+    const unmounted = vi.fn();
+    const World = () => {
+      useEffect(() => {
+        mounted();
+        return unmounted;
+      }, []);
+      return <span>world</span>;
+    };
+    const Caption = ({ context }: { context: FrameRenderContext }) => (
+      <span data-testid="timed-caption">
+        {context.localFrame}:{context.progress}:{context.scope}
+      </span>
+    );
+    const source = {
+      ...project,
+      videos: [
+        {
+          ...project.videos[0],
+          backgroundLayers: [{ id: "world", surfaceId: "background" }],
+          overlayLayers: [{ id: "caption", surfaceId: "card", startFrame: 22, durationInFrames: 4 }],
+          scenes: project.videos[0].scenes.map((scene) => ({ ...scene, layers: [] })),
+        },
+      ],
+    };
+    const video = compileStagecutVideo(source, "demo");
+    const surfaces = { background: World, card: Caption };
+    const view = render(<StagecutComposition surfaces={surfaces} video={video} />);
+    expect(screen.queryByTestId("timed-caption")).toBeNull();
+    for (const frame of [23, 40, 25, 22, 26]) {
+      remotionState.frame = frame;
+      view.rerender(<StagecutComposition surfaces={surfaces} video={video} />);
+      if (frame === 22) expect(screen.getByTestId("timed-caption").textContent).toBe("0:0:overlay");
+      if (frame === 25) expect(screen.getByTestId("timed-caption").textContent).toBe("3:1:overlay");
+      if (frame === 26 || frame === 40) expect(screen.queryByTestId("timed-caption")).toBeNull();
+    }
+    expect(mounted).toHaveBeenCalledTimes(1);
+    expect(unmounted).not.toHaveBeenCalled();
+    view.unmount();
+    expect(unmounted).toHaveBeenCalledTimes(1);
+  });
   it("keeps surfaces deterministic by default and explicitly enables active-scene interaction", () => {
     const { surfaces, video } = createRuntime();
     const deterministic = render(<StagecutComposition surfaces={surfaces} video={video} />);
