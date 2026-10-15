@@ -35,3 +35,6 @@ jobs:
       - run: pnpm --filter @stage-cut/devtools run build && cd packages/devtools && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: pnpm --filter @stage-cut/render run build && cd packages/render && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

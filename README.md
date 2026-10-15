@@ -127,6 +127,8 @@ never modify source files directly.
 
 ## Video creation and export
 
+Version 1.0 migration notes: [frame clocks, persistent layers and export](docs/migration-1.0.md).
+
 Use `StagecutRenderRoot` to expose project videos to the optional renderer. Persistent worlds and music use `backgroundLayers`; cross-scene titles and captions use `overlayLayers`. Each Layer can specify its own `startFrame` and `durationInFrames`. `StagecutResource` synchronizes resource preparation with capture.
 
 ```bash

@@ -1,6 +1,6 @@
 {
   "name": "@stage-cut/devtools",
-  "version": "0.5.0-beta.2",
+  "version": "1.0.0",
   "description": "In-page preview and debugging studio for Stagecut projects.",
   "type": "module",
   "main": "./dist/index.cjs",

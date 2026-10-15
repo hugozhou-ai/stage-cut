@@ -140,6 +140,8 @@ StageCut 以 [MIT License](LICENSE) 开源。
 
 ## 视频制作与导出
 
+1.0 迁移说明：[帧时钟、持久图层与导出](docs/migration-1.0.md)。
+
 `backgroundLayers` 承载持续世界与音乐，`overlayLayers` 编排跨场景字幕。图层支持独立的 `startFrame` 与 `durationInFrames`。使用 `StagecutResource` 等待资源、`StagecutRenderRoot` 自动声明所有影片。
 
 ```bash

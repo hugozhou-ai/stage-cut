@@ -1,6 +1,6 @@
 {
   "name": "@stage-cut/render",
-  "version": "0.5.0-beta.2",
+  "version": "1.0.0",
   "description": "Frame-precise StageCut video export and agent feedback CLI.",
   "type": "module",
   "exports": {
